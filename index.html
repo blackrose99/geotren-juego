@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>🚂 GeoTren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ══════ MENÚ ══════ -->
+<div id="screen-menu" class="screen active">
+  <div class="cloud-layer" aria-hidden="true">
+    <span class="cloud" style="top:8%;left:3%;font-size:2.8rem;animation-delay:0s">☁️</span>
+    <span class="cloud" style="top:15%;left:60%;font-size:2rem;animation-delay:3s">☁️</span>
+    <span class="cloud" style="top:5%;left:33%;font-size:3.2rem;animation-delay:6s">☁️</span>
+  </div>
+  <div class="menu-wrap">
+    <div class="menu-emoji">🚂</div>
+    <h1 class="menu-title">GeoTren</h1>
+    <p class="menu-sub">¡Arma tu tren con figuras geométricas!</p>
+    <div class="menu-cards">
+      <button class="card" onclick="startLevel(1)">
+        <span class="card-star">⭐</span>
+        <span class="card-num">Nivel 1</span>
+        <span class="card-name">Reconocimiento</span>
+        <span class="card-tip">¿Qué figura va aquí?</span>
+      </button>
+      <button class="card" onclick="startLevel(2)">
+        <span class="card-star">⭐⭐</span>
+        <span class="card-num">Nivel 2</span>
+        <span class="card-name">Ubicación</span>
+        <span class="card-tip">Arriba · Abajo · Izquierda…</span>
+      </button>
+      <button class="card" onclick="startLevel(3)">
+        <span class="card-star">⭐⭐⭐</span>
+        <span class="card-num">Nivel 3</span>
+        <span class="card-name">Rotación</span>
+        <span class="card-tip">¡Gira las figuras!</span>
+      </button>
+    </div>
+    <button class="sound-btn" id="menuSoundBtn" onclick="toggleSound()">🔊 Sonido: ON</button>
+    <p class="menu-credit">Juego educativo para primaria 🎒</p>
+  </div>
+  <div class="menu-rail-bottom" aria-hidden="true"></div>
+</div>
+
+<!-- ══════ JUEGO ══════ -->
+<div id="screen-game" class="screen">
+  <!-- Header -->
+  <div class="top-bar">
+    <button class="icon-btn" onclick="goMenu()">🏠</button>
+    <div class="top-center">
+      <span class="lvl-tag" id="lvlTag">Nivel 1</span>
+      <div class="bulbs" id="bulbs"></div>
+    </div>
+    <button class="icon-btn" id="gameSoundBtn" onclick="toggleSound()">🔊</button>
+  </div>
+
+  <!-- Instrucción -->
+  <div class="instr" id="instr" role="status" aria-live="polite">
+    ¡Arrastra las figuras al tren!
+  </div>
+
+  <!-- Escena con tren -->
+  <div class="scene" id="scene">
+    <div class="sky" aria-hidden="true">
+      <span class="scloud" style="animation-delay:0s;left:5%">☁️</span>
+      <span class="scloud" style="animation-delay:6s;left:40%">☁️</span>
+      <span class="scloud" style="animation-delay:12s;left:70%">☁️</span>
+    </div>
+    <!-- El tren se inyecta aquí -->
+    <div class="train-wrap" id="trainWrap"></div>
+    <div class="ground" aria-hidden="true">
+      <div class="rail"></div>
+      <div class="rail"></div>
+    </div>
+  </div>
+
+  <!-- Banco de figuras -->
+  <div class="bank">
+    <div class="bank-title">📦 Arrastra las figuras al tren</div>
+    <div class="bank-row" id="bankRow" role="list"></div>
+  </div>
+
+  <!-- Botones -->
+  <div class="game-footer">
+    <button class="fbtn fbtn-red" onclick="resetLevel()">🔄 Reiniciar</button>
+    <button class="fbtn fbtn-green hidden" id="nextBtn" onclick="nextLevel()">➡️ Siguiente</button>
+  </div>
+</div>
+
+<!-- ══════ NIVEL COMPLETO ══════ -->
+<div id="screen-lvl" class="screen overlay">
+  <div class="modal">
+    <div class="modal-confetti" id="modalConfetti"></div>
+    <div class="big-emoji">🎉</div>
+    <h2 class="modal-h">¡Nivel Completado!</h2>
+    <p class="modal-p" id="lvlMsg">¡Excelente!</p>
+    <div class="modal-stars" id="modalStars">⭐⭐⭐</div>
+    <div class="modal-btns">
+      <button class="pbtn" onclick="nextLevel()">➡️ Siguiente Nivel</button>
+      <button class="pbtn pbtn-gray" onclick="goMenu()">🏠 Menú</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ JUEGO COMPLETO ══════ -->
+<div id="screen-win" class="screen overlay">
+  <div class="firework-bg" id="fwBg"></div>
+  <div class="modal modal-big">
+    <div class="big-trophy">🏆</div>
+    <h2 class="modal-h rainbow-text">¡FELICITACIONES!</h2>
+    <p class="modal-p big-p">¡Construiste el tren completo!</p>
+    <p class="modal-p">¡El GeoTren ya puede viajar por el mundo!</p>
+    <div class="train-ride-box" aria-hidden="true">
+      <div class="train-ride">🚂🚃🚃💨</div>
+    </div>
+    <button class="pbtn pbtn-big" onclick="goMenu()">🏠 Jugar de Nuevo</button>
+  </div>
+</div>
+
+<!-- Ghost de arrastre -->
+<div id="ghost" class="ghost" aria-hidden="true"></div>
+<!-- Toast de error -->
+<div id="toast" class="toast" role="alert"></div>
+
+<script src="game.js"></script>
+</body>
+</html>
