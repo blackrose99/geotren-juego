@@ -1,1460 +1,2306 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>🚂 GeoTren</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
-<style>
-/* ════════════════ BASE ════════════════ */
-:root {
-  --red:    #e84e5e;
-  --yellow: #ffd700;
-  --blue:   #1E90FF;
-  --green:  #2ed573;
-  --sky-a:  #87ceeb;
-  --sky-b:  #c5e8f9;
-  --grass:  #5dbb63;
-  --rail:   #7b4f2e;
-  --ff-h: "Fredoka One", cursive;
-  --ff-b: "Nunito", sans-serif;
-  --sh: 0 4px 16px rgba(0,0,0,.22);
-  --sh-sm: 0 2px 8px rgba(0,0,0,.15);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px}
-body{
-  font-family:var(--ff-b);
-  background:#fff9c4;
-  min-height:100vh;
-  overflow-x:hidden;
-  overflow-y:auto;
-  user-select:none;
-  -webkit-user-select:none;
-}
-button{cursor:pointer;border:none;font-family:var(--ff-b)}
-button:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>🚂 GeoTren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ════════════════ BASE ════════════════ */
+    :root {
+      --red: #e84e5e;
+      --yellow: #ffd700;
+      --blue: #1E90FF;
+      --green: #2ed573;
+      --sky-a: #87ceeb;
+      --sky-b: #c5e8f9;
+      --grass: #5dbb63;
+      --rail: #7b4f2e;
+      --ff-h: "Fredoka One", cursive;
+      --ff-b: "Nunito", sans-serif;
+      --sh: 0 4px 16px rgba(0, 0, 0, .22);
+      --sh-sm: 0 2px 8px rgba(0, 0, 0, .15);
+    }
 
-/* ════════════════ SCREENS ════════════════ */
-.screen{display:none;min-height:100vh;flex-direction:column}
-.screen.active{display:flex}
-.overlay{
-  position:fixed;inset:0;z-index:800;
-  align-items:center;justify-content:center;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(5px);
-}
-.overlay.active{display:flex}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ════════════════ MENU ════════════════ */
-#screen-menu{
-  background:linear-gradient(160deg,#fff9c4,#e3f2fd);
-  align-items:center;justify-content:center;
-  padding:20px 16px 60px;
-  min-height:100vh;
-  overflow-y:auto;
-  position:relative;
-}
-.cloud-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.cloud{position:absolute;animation:floatCloud 9s ease-in-out infinite}
-@keyframes floatCloud{0%,100%{transform:translateX(0)}50%{transform:translateX(14px)}}
+    html {
+      font-size: 16px
+    }
 
-.menu-wrap{
-  position:relative;z-index:5;
-  display:flex;flex-direction:column;align-items:center;
-  gap:16px;width:100%;max-width:680px;
-}
-.menu-emoji{
-  font-size:clamp(4rem,11vw,6rem);
-  animation:emojiBounce 1.5s ease-in-out infinite;
-  filter:drop-shadow(0 6px 12px rgba(0,0,0,.2));
-}
-@keyframes emojiBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
-.menu-title{
-  font-family:var(--ff-h);
-  font-size:clamp(2.4rem,8vw,4.2rem);
-  color:var(--red);
-  text-shadow:3px 3px 0 var(--yellow),5px 5px 0 rgba(0,0,0,.1);
-  text-align:center;
-}
-.menu-sub{font-size:clamp(.95rem,3vw,1.2rem);font-weight:800;color:#555;text-align:center}
-.menu-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%}
-.card{
-  background:#fff;border-radius:18px;padding:14px 12px;
-  min-width:128px;flex:1 1 120px;max-width:170px;
-  box-shadow:var(--sh);
-  transition:transform .18s,box-shadow .18s;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  border:3px solid transparent;
-}
-.card:nth-child(1){border-color:var(--yellow)}
-.card:nth-child(2){border-color:#48dbfb}
-.card:nth-child(3){border-color:#ff6b81}
-.card:nth-child(4){border-color:var(--green)}
-.card:hover{transform:translateY(-5px) scale(1.04);box-shadow:0 12px 28px rgba(0,0,0,.22)}
-.card-star{font-size:1.2rem}
-.card-num{font-family:var(--ff-h);font-size:1.2rem;color:var(--red)}
-.card-name{font-weight:900;color:#333;font-size:.9rem}
-.card-tip{font-size:.72rem;color:#888;text-align:center}
-.sound-btn{
-  background:var(--red);color:#fff;font-weight:800;font-size:1rem;
-  padding:10px 26px;border-radius:50px;box-shadow:var(--sh-sm);
-  transition:background .2s,transform .15s;
-}
-.sound-btn:hover{background:#c0392b;transform:scale(1.05)}
-.sound-btn.off{background:#aaa}
-.menu-credit{font-size:.82rem;color:#888;text-align:center;font-weight:700}
-.menu-authors{font-size:.9rem;color:var(--red);font-weight:900;text-align:center;letter-spacing:.02em}
-.menu-rail-bottom{
-  position:absolute;bottom:0;left:0;right:0;height:24px;
-  background:repeating-linear-gradient(90deg,var(--rail) 0,var(--rail) 34px,transparent 34px,transparent 54px)
-    0 50%/100% 5px no-repeat;
-}
+    body {
+      font-family: var(--ff-b);
+      background: #fff9c4;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-/* ════════════════ GAME SCREEN ════════════════ */
-#screen-game{
-  display:none;
-  flex-direction:column;
-  min-height:100vh;
-  overflow-y:auto;
-  overflow-x:hidden;
-  background:linear-gradient(180deg,var(--sky-a),var(--sky-b));
-}
-#screen-game.active{display:flex}
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: var(--ff-b)
+    }
 
-/* Top bar */
-.top-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;background:var(--red);
-  box-shadow:0 2px 8px rgba(0,0,0,.2);
-  flex-shrink:0;z-index:20;position:sticky;top:0;
-}
-.icon-btn{
-  font-size:1.4rem;background:rgba(255,255,255,.25);border-radius:50%;
-  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
-  color:#fff;transition:background .15s,transform .15s;
-  touch-action:manipulation;
-}
-.icon-btn:hover{background:rgba(255,255,255,.4);transform:scale(1.1)}
-.top-center{display:flex;flex-direction:column;align-items:center;gap:4px}
-.lvl-tag{font-family:var(--ff-h);font-size:1.05rem;color:#fff;text-shadow:1px 2px 4px rgba(0,0,0,.25)}
-.bulbs{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:220px}
-.bulb{font-size:.9rem;filter:grayscale(1) brightness(.65);transition:filter .4s,transform .35s}
-.bulb.on{filter:none;transform:scale(1.3);animation:bulbPop .4s ease}
-@keyframes bulbPop{0%{transform:scale(1)}50%{transform:scale(1.75)}100%{transform:scale(1.3)}}
+    button:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 2px
+    }
 
-/* Instruction */
-.instr{
-  background:#fff9c4;border-bottom:3px solid var(--yellow);
-  padding:8px 14px;text-align:center;flex-shrink:0;
-  font-size:clamp(.82rem,2.8vw,1rem);font-weight:800;color:#5d4037;
-  min-height:46px;display:flex;align-items:center;justify-content:center;
-  line-height:1.45;flex-wrap:wrap;
-}
-.instr b{color:var(--red)}
-.badge{
-  display:inline-block;margin-left:8px;padding:2px 10px;
-  background:var(--red);color:#fff;border-radius:20px;
-  font-size:.72rem;font-weight:900;white-space:nowrap;vertical-align:middle;
-}
-.arrow{font-size:1.3em;vertical-align:middle}
+    /* ════════════════ SCREENS ════════════════ */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column
+    }
 
-/* Scene / train area */
-.scene{
-  position:relative;
-  flex-shrink:0;
-  padding:20px 12px 0;
-  min-height:260px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-}
-.sky-clouds{position:absolute;top:0;left:0;right:0;pointer-events:none;overflow:hidden;height:100%}
-.scloud{position:absolute;top:8%;font-size:clamp(1.4rem,5vw,2.2rem);animation:driftCloud 15s linear infinite}
-@keyframes driftCloud{from{transform:translateX(-160px);opacity:0}8%{opacity:1}92%{opacity:1}to{transform:translateX(110vw);opacity:0}}
+    .screen.active {
+      display: flex
+    }
 
-/* Train container: horizontal scroll if needed */
-.train-scroll{
-  width:100%;
-  overflow-x:auto;
-  overflow-y:visible;
-  padding:0 12px 10px;
-  -webkit-overflow-scrolling:touch;
-}
-.train-scroll::-webkit-scrollbar{height:6px}
-.train-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px}
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 800;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .6);
+      backdrop-filter: blur(5px);
+    }
 
-.train-wrap{
-  display:inline-flex;
-  align-items:flex-end;
-  gap:0;
-  min-width:100%;
-  justify-content:center;
-  padding:10px 16px 0;
-}
+    .overlay.active {
+      display: flex
+    }
 
-/* Ground / rails */
-.ground{
-  height:52px;background:linear-gradient(180deg,var(--grass),#4ca653);
-  flex-shrink:0;display:flex;flex-direction:column;justify-content:space-around;padding:6px 0;
-  position:sticky;bottom:0;z-index:5;
-}
-.rail{
-  height:5px;
-  background:repeating-linear-gradient(90deg,var(--rail) 0,var(--rail) 36px,transparent 36px,transparent 58px);
-}
+    /* ════════════════ MENU ════════════════ */
+    #screen-menu {
+      background: linear-gradient(160deg, #fff9c4, #e3f2fd);
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px 60px;
+      min-height: 100vh;
+      overflow-y: auto;
+      position: relative;
+    }
 
-/* ════════════════ TRAIN PIECES ════════════════ */
-/* Each train car is a column of slots */
-.train-car{
-  display:flex;flex-direction:column;align-items:center;
-  position:relative;flex-shrink:0;
-}
-.connector{
-  display:flex;align-items:center;margin-bottom:32px;
-  flex-shrink:0;
-}
-.conn-bar{height:8px;width:20px;background:#7b4f2e;border-radius:4px}
-.conn-dot{width:10px;height:10px;border-radius:50%;background:#5a3a1a;border:2px solid #3a2010}
+    .cloud-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
 
-/* Slot: placeholder for a figure */
-.slot{
-  border:3px dashed rgba(0,0,0,.22);
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
-  cursor:pointer;
-  background:rgba(255,255,255,.25);
-  transition:background .2s,border-color .2s,transform .15s;
-  flex-shrink:0;
-}
-.slot:not(.filled):hover{background:rgba(255,255,255,.5);transform:scale(1.04)}
-.slot.over{background:rgba(255,215,0,.35);border-color:var(--yellow);border-style:solid;transform:scale(1.06)}
-.slot.filled{border-style:solid;border-color:rgba(0,0,0,.15);cursor:default;background:transparent}
-.slot.target{border-color:var(--yellow);border-style:solid;animation:targetPulse 1s ease-in-out infinite;background:rgba(255,215,0,.2)}
-@keyframes targetPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.5)}50%{box-shadow:0 0 0 8px rgba(255,215,0,0)}}
-.slot.error{border-color:#ff4757;animation:errorShake .4s ease}
-@keyframes errorShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.slot-hint{
-  position:absolute;inset:3px;display:flex;align-items:center;justify-content:center;
-  opacity:.22;pointer-events:none;
-}
-.slot-lbl{
-  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
-  font-size:.55rem;font-weight:900;color:rgba(0,0,0,.5);white-space:nowrap;letter-spacing:.02em;
-  pointer-events:none;
-}
-.placed-check{
-  position:absolute;top:-10px;right:-8px;font-size:.9rem;
-  animation:checkPop .4s cubic-bezier(.34,1.56,.64,1) both;
-}
-@keyframes checkPop{from{transform:scale(0)}to{transform:scale(1)}}
+    .cloud {
+      position: absolute;
+      animation: floatCloud 9s ease-in-out infinite
+    }
 
-/* Slot size by shape */
-.slot[data-shape="circle"]   {width:60px;height:60px;border-radius:50%}
-.slot[data-shape="square"]   {width:60px;height:60px}
-.slot[data-shape="rectangle"]{width:100px;height:50px}
-.slot[data-shape="triangle"] {width:62px;height:56px}
+    @keyframes floatCloud {
 
-/* Slot hints by shape */
-.sh-circle   {width:80%;height:80%;border-radius:50%;border:3px solid rgba(0,0,0,.4)}
-.sh-square   {width:75%;height:75%;border:3px solid rgba(0,0,0,.4)}
-.sh-rectangle{width:90%;height:70%;border:3px solid rgba(0,0,0,.4)}
-.sh-triangle {
-  width:0;height:0;
-  border-left:24px solid transparent;border-right:24px solid transparent;
-  border-bottom:42px solid rgba(0,0,0,.35);
-}
+      0%,
+      100% {
+        transform: translateX(0)
+      }
 
-/* Placed figure fills slot */
-.placed{width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.placed svg{width:100%;height:100%;display:block}
+      50% {
+        transform: translateX(14px)
+      }
+    }
 
-/* Wheels row */
-.wheels-row{
-  display:flex;gap:16px;align-items:center;
-  margin-top:4px;
-  flex-shrink:0;
-}
-.axle{height:6px;flex:1;background:repeating-linear-gradient(90deg,#5a3a1a 0,#5a3a1a 4px,#9c6a3a 4px,#9c6a3a 8px);border-radius:3px;min-width:20px}
+    .menu-wrap {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 680px;
+    }
 
-/* Decorative car body frames */
-.car-body{
-  background:rgba(255,255,255,.12);
-  border:2px solid rgba(0,0,0,.18);
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.car-roof{
-  display:flex;align-items:flex-end;justify-content:center;
-  flex-shrink:0;
-}
-.car-top{
-  display:flex;align-items:center;justify-content:space-around;
-  gap:6px;width:100%;flex-shrink:0;
-}
-.chimney-area{
-  display:flex;flex-direction:column;align-items:center;
-  gap:0;flex-shrink:0;
-}
-.chimney-cap{
-  width:22px;height:8px;background:#4a2c0a;border-radius:4px 4px 0 0;
-}
+    .menu-emoji {
+      font-size: clamp(4rem, 11vw, 6rem);
+      animation: emojiBounce 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .2));
+    }
 
-/* ════════════════ BANK ════════════════ */
-.bank{
-  background:linear-gradient(180deg,#fffaf0,#fff4e0);
-  border-top:3px solid var(--yellow);
-  padding:8px 12px 12px;flex-shrink:0;
-}
-.bank-title{
-  font-size:.78rem;font-weight:900;color:var(--red);
-  margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;
-}
-.bank-row{
-  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
-  align-items:flex-end;min-height:90px;
-}
+    @keyframes emojiBounce {
 
-/* Figure in bank */
-.fig-wrap{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:grab;flex-shrink:0;touch-action:none;
-}
-.fig-wrap:active{cursor:grabbing}
-.fig{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  padding:8px;
-  background:#fff;border-radius:12px;
-  box-shadow:var(--sh-sm);
-  transition:opacity .25s,transform .15s,box-shadow .15s;
-}
-.fig:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,.22)}
-.fig-used{opacity:.2!important;pointer-events:none!important}
-.fig-lbl{font-size:.68rem;font-weight:900;color:#555;white-space:nowrap}
-.rot-deg{font-size:.65rem;font-weight:900;color:var(--red);letter-spacing:.02em}
-.rot-btn{
-  position:absolute;top:-10px;right:-10px;
-  width:28px;height:28px;border-radius:50%;
-  background:var(--yellow);color:#333;font-size:.9rem;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:var(--sh-sm);border:2px solid #fff;z-index:10;
-  transition:transform .25s,background .2s;touch-action:manipulation;
-}
-.rot-btn:hover{background:#ffa502;transform:rotate(90deg) scale(1.2)}
+      0%,
+      100% {
+        transform: translateY(0) rotate(-3deg)
+      }
 
-/* ════════════════ FOOTER ════════════════ */
-.game-footer{
-  display:flex;gap:10px;padding:8px 12px 14px;
-  background:#fff;border-top:2px solid #eee;
-  justify-content:center;flex-shrink:0;
-  flex-wrap:wrap;
-}
-.fbtn{
-  color:#fff;font-size:.92rem;font-weight:800;
-  padding:11px 24px;border-radius:50px;box-shadow:var(--sh-sm);
-  transition:background .18s,transform .15s;touch-action:manipulation;
-}
-.fbtn:hover{transform:scale(1.05)}
-.fbtn-red{background:var(--red)}
-.fbtn-red:hover{background:#c0392b}
-.fbtn-green{background:var(--green)}
-.fbtn-green:hover{background:#0abf53}
-.hidden{display:none!important}
+      50% {
+        transform: translateY(-12px) rotate(3deg)
+      }
+    }
 
-/* ════════════════ MODALS ════════════════ */
-.modal{
-  background:#fff;border-radius:26px;padding:26px 22px 22px;
-  max-width:360px;width:92%;
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
-  text-align:center;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
-  max-height:90vh;overflow-y:auto;
-}
-.modal-big{max-width:420px}
-@keyframes popIn{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-.modal-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.confetti-bit{position:absolute;border-radius:2px;animation:confettiFall linear forwards}
-@keyframes confettiFall{from{transform:translateY(-20px) rotate(0);opacity:1}to{transform:translateY(400px) rotate(540deg);opacity:0}}
-.big-emoji{font-size:3rem}
-.big-trophy{font-size:4rem;animation:trophyWobble 2s ease-in-out infinite}
-@keyframes trophyWobble{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.1)}}
-.modal-h{font-family:var(--ff-h);font-size:clamp(1.5rem,5vw,2.1rem);color:var(--red)}
-.modal-p{font-size:.9rem;color:#666;font-weight:700}
-.big-p{font-size:1rem;color:#444;font-weight:800}
-.modal-stars{font-size:1.9rem;animation:starsBounce .6s ease .2s both}
-@keyframes starsBounce{from{transform:scale(0);opacity:0}70%{transform:scale(1.4)}to{transform:scale(1);opacity:1}}
-.modal-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-.pbtn{
-  background:var(--red);color:#fff;font-size:.95rem;font-weight:800;
-  padding:11px 22px;border-radius:50px;box-shadow:var(--sh-sm);
-  transition:background .18s,transform .15s;touch-action:manipulation;
-}
-.pbtn:hover{background:#c0392b;transform:scale(1.05)}
-.pbtn-gray{background:#aaa}
-.pbtn-gray:hover{background:#888}
-.pbtn-big{font-size:1.05rem;padding:13px 30px;margin-top:4px}
-.train-ride-box{overflow:hidden;width:100%;height:52px;position:relative}
-.train-ride{position:absolute;font-size:2.2rem;animation:trainRide 3s linear infinite;white-space:nowrap;bottom:0}
-@keyframes trainRide{from{transform:translateX(-130%)}to{transform:translateX(110%)}}
-.rainbow-text{
-  background:linear-gradient(90deg,#ff4757,#ff9f43,#ffd700,#2ed573,#48dbfb,#a55eea);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:rainbowShift 3s linear infinite;background-size:200%;
-}
-@keyframes rainbowShift{from{background-position:0%}to{background-position:200%}}
-.firework-bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.fw{position:absolute;font-size:2.5rem;animation:fwPop 1.3s ease-out forwards}
-@keyframes fwPop{0%{transform:scale(0) rotate(0);opacity:1}60%{transform:scale(1.5) rotate(180deg);opacity:1}100%{transform:scale(.4) rotate(360deg);opacity:0}}
+    .menu-title {
+      font-family: var(--ff-h);
+      font-size: clamp(2.4rem, 8vw, 4.2rem);
+      color: var(--red);
+      text-shadow: 3px 3px 0 var(--yellow), 5px 5px 0 rgba(0, 0, 0, .1);
+      text-align: center;
+    }
 
-/* ════════════════ GHOST ════════════════ */
-.ghost{position:fixed;pointer-events:none;z-index:9999;display:none;opacity:.85;transform:scale(1.15);filter:drop-shadow(0 8px 20px rgba(0,0,0,.35))}
+    .menu-sub {
+      font-size: clamp(.95rem, 3vw, 1.2rem);
+      font-weight: 800;
+      color: #555;
+      text-align: center
+    }
 
-/* ════════════════ TOAST ════════════════ */
-.toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(14px);
-  background:#ff4757;color:#fff;font-weight:800;font-size:.92rem;
-  padding:10px 22px;border-radius:50px;
-  opacity:0;transition:opacity .3s,transform .3s;
-  pointer-events:none;z-index:500;
-  white-space:normal;max-width:88vw;text-align:center;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .menu-cards {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%
+    }
 
-/* ════════════════ RESPONSIVE ════════════════ */
-@media(max-width:480px){
-  .slot[data-shape="circle"]   {width:50px;height:50px}
-  .slot[data-shape="square"]   {width:50px;height:50px}
-  .slot[data-shape="rectangle"]{width:84px;height:44px}
-  .slot[data-shape="triangle"] {width:54px;height:50px}
-  .bank-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;justify-content:flex-start}
-  .bank-row::-webkit-scrollbar{height:8px}
-  .bank-row::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:6px}
-  .icon-btn{width:48px;height:48px}
-  .fbtn{padding:12px 20px;font-size:1rem}
-  .card{min-width:100px;max-width:138px;padding:11px 8px}
-  .card-tip{display:none}
-}
-@keyframes smokePuff{0%{transform:scale(.4) translateY(0);opacity:.7}100%{transform:scale(2.2) translateY(-55px);opacity:0}}
-.slot-correct-flash{animation:cFlash .5s ease!important}
-@keyframes cFlash{0%,100%{box-shadow:0 0 0 0 rgba(46,213,115,0)}50%{box-shadow:0 0 0 14px rgba(46,213,115,.3)}}
-</style>
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 14px 12px;
+      min-width: 128px;
+      flex: 1 1 120px;
+      max-width: 170px;
+      box-shadow: var(--sh);
+      transition: transform .18s, box-shadow .18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      border: 3px solid transparent;
+    }
+
+    .card:nth-child(1) {
+      border-color: var(--yellow)
+    }
+
+    .card:nth-child(2) {
+      border-color: #48dbfb
+    }
+
+    .card:nth-child(3) {
+      border-color: #ff6b81
+    }
+
+    .card:nth-child(4) {
+      border-color: var(--green)
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.04);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .22)
+    }
+
+    .card-star {
+      font-size: 1.2rem
+    }
+
+    .card-num {
+      font-family: var(--ff-h);
+      font-size: 1.2rem;
+      color: var(--red)
+    }
+
+    .card-name {
+      font-weight: 900;
+      color: #333;
+      font-size: .9rem
+    }
+
+    .card-tip {
+      font-size: .72rem;
+      color: #888;
+      text-align: center
+    }
+
+    .sound-btn {
+      background: var(--red);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 10px 26px;
+      border-radius: 50px;
+      box-shadow: var(--sh-sm);
+      transition: background .2s, transform .15s;
+    }
+
+    .sound-btn:hover {
+      background: #c0392b;
+      transform: scale(1.05)
+    }
+
+    .sound-btn.off {
+      background: #aaa
+    }
+
+    .menu-credit {
+      font-size: .82rem;
+      color: #888;
+      text-align: center;
+      font-weight: 700
+    }
+
+    .menu-authors {
+      font-size: .9rem;
+      color: var(--red);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: .02em
+    }
+
+    .menu-rail-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 24px;
+      background: repeating-linear-gradient(90deg, var(--rail) 0, var(--rail) 34px, transparent 34px, transparent 54px) 0 50%/100% 5px no-repeat;
+    }
+
+    /* ════════════════ GAME SCREEN ════════════════ */
+    #screen-game {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: linear-gradient(180deg, var(--sky-a), var(--sky-b));
+    }
+
+    #screen-game.active {
+      display: flex
+    }
+
+    /* Top bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--red);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+      flex-shrink: 0;
+      z-index: 20;
+      position: sticky;
+      top: 0;
+    }
+
+    .icon-btn {
+      font-size: 1.4rem;
+      background: rgba(255, 255, 255, .25);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: background .15s, transform .15s;
+      touch-action: manipulation;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, .4);
+      transform: scale(1.1)
+    }
+
+    .top-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px
+    }
+
+    .lvl-tag {
+      font-family: var(--ff-h);
+      font-size: 1.05rem;
+      color: #fff;
+      text-shadow: 1px 2px 4px rgba(0, 0, 0, .25)
+    }
+
+    .bulbs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 220px
+    }
+
+    .bulb {
+      font-size: .9rem;
+      filter: grayscale(1) brightness(.65);
+      transition: filter .4s, transform .35s
+    }
+
+    .bulb.on {
+      filter: none;
+      transform: scale(1.3);
+      animation: bulbPop .4s ease
+    }
+
+    @keyframes bulbPop {
+      0% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.75)
+      }
+
+      100% {
+        transform: scale(1.3)
+      }
+    }
+
+    /* Instruction */
+    .instr {
+      background: #fff9c4;
+      border-bottom: 3px solid var(--yellow);
+      padding: 8px 14px;
+      text-align: center;
+      flex-shrink: 0;
+      font-size: clamp(.82rem, 2.8vw, 1rem);
+      font-weight: 800;
+      color: #5d4037;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.45;
+      flex-wrap: wrap;
+    }
+
+    .instr b {
+      color: var(--red)
+    }
+
+    .badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 10px;
+      background: var(--red);
+      color: #fff;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 900;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .arrow {
+      font-size: 1.3em;
+      vertical-align: middle
+    }
+
+    /* Scene / train area */
+    .scene {
+      position: relative;
+      flex-shrink: 0;
+      padding: 20px 12px 0;
+      min-height: 260px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sky-clouds {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      overflow: hidden;
+      height: 100%
+    }
+
+    .scloud {
+      position: absolute;
+      top: 8%;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      animation: driftCloud 15s linear infinite
+    }
+
+    @keyframes driftCloud {
+      from {
+        transform: translateX(-160px);
+        opacity: 0
+      }
+
+      8% {
+        opacity: 1
+      }
+
+      92% {
+        opacity: 1
+      }
+
+      to {
+        transform: translateX(110vw);
+        opacity: 0
+      }
+    }
+
+    /* Train container: horizontal scroll if needed */
+    .train-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 0 12px 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .train-scroll::-webkit-scrollbar {
+      height: 6px
+    }
+
+    .train-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, .15);
+      border-radius: 4px
+    }
+
+    .train-wrap {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 0;
+      min-width: 100%;
+      justify-content: center;
+      padding: 10px 16px 0;
+    }
+
+    /* Ground / rails */
+    .ground {
+      height: 52px;
+      background: linear-gradient(180deg, var(--grass), #4ca653);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 6px 0;
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
+    }
+
+    .rail {
+      height: 5px;
+      background: repeating-linear-gradient(90deg, var(--rail) 0, var(--rail) 36px, transparent 36px, transparent 58px);
+    }
+
+    /* ════════════════ TRAIN PIECES ════════════════ */
+    /* Each train car is a column of slots */
+    .train-car {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .connector {
+      display: flex;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-shrink: 0;
+    }
+
+    .conn-bar {
+      height: 8px;
+      width: 20px;
+      background: #7b4f2e;
+      border-radius: 4px
+    }
+
+    .conn-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #5a3a1a;
+      border: 2px solid #3a2010
+    }
+
+    /* Slot: placeholder for a figure */
+    .slot {
+      border: 3px dashed rgba(0, 0, 0, .22);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .25);
+      transition: background .2s, border-color .2s, transform .15s;
+      flex-shrink: 0;
+    }
+
+    .slot:not(.filled):hover {
+      background: rgba(255, 255, 255, .5);
+      transform: scale(1.04)
+    }
+
+    .slot.over {
+      background: rgba(255, 215, 0, .35);
+      border-color: var(--yellow);
+      border-style: solid;
+      transform: scale(1.06)
+    }
+
+    .slot.filled {
+      border-style: solid;
+      border-color: rgba(0, 0, 0, .15);
+      cursor: default;
+      background: transparent
+    }
+
+    .slot.target {
+      border-color: var(--yellow);
+      border-style: solid;
+      animation: targetPulse 1s ease-in-out infinite;
+      background: rgba(255, 215, 0, .2)
+    }
+
+    @keyframes targetPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, .5)
+      }
+
+      50% {
+        box-shadow: 0 0 0 8px rgba(255, 215, 0, 0)
+      }
+    }
+
+    .slot.error {
+      border-color: #ff4757;
+      animation: errorShake .4s ease
+    }
+
+    @keyframes errorShake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-6px)
+      }
+
+      75% {
+        transform: translateX(6px)
+      }
+    }
+
+    .slot-hint {
+      position: absolute;
+      inset: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .22;
+      pointer-events: none;
+    }
+
+    .slot-lbl {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: .55rem;
+      font-weight: 900;
+      color: rgba(0, 0, 0, .5);
+      white-space: nowrap;
+      letter-spacing: .02em;
+      pointer-events: none;
+    }
+
+    .placed-check {
+      position: absolute;
+      top: -10px;
+      right: -8px;
+      font-size: .9rem;
+      animation: checkPop .4s cubic-bezier(.34, 1.56, .64, 1) both;
+    }
+
+    @keyframes checkPop {
+      from {
+        transform: scale(0)
+      }
+
+      to {
+        transform: scale(1)
+      }
+    }
+
+    /* Slot size by shape */
+    .slot[data-shape="circle"] {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%
+    }
+
+    .slot[data-shape="square"] {
+      width: 60px;
+      height: 60px
+    }
+
+    .slot[data-shape="rectangle"] {
+      width: 100px;
+      height: 50px
+    }
+
+    .slot[data-shape="triangle"] {
+      width: 62px;
+      height: 56px
+    }
+
+    /* Slot hints by shape */
+    .sh-circle {
+      width: 80%;
+      height: 80%;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 0, 0, .4)
+    }
+
+    .sh-square {
+      width: 75%;
+      height: 75%;
+      border: 3px solid rgba(0, 0, 0, .4)
+    }
+
+    .sh-rectangle {
+      width: 90%;
+      height: 70%;
+      border: 3px solid rgba(0, 0, 0, .4)
+    }
+
+    .sh-triangle {
+      width: 0;
+      height: 0;
+      border-left: 24px solid transparent;
+      border-right: 24px solid transparent;
+      border-bottom: 42px solid rgba(0, 0, 0, .35);
+    }
+
+    /* Placed figure fills slot */
+    .placed {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none
+    }
+
+    .placed svg {
+      width: 100%;
+      height: 100%;
+      display: block
+    }
+
+    /* Wheels row */
+    .wheels-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .axle {
+      height: 6px;
+      flex: 1;
+      background: repeating-linear-gradient(90deg, #5a3a1a 0, #5a3a1a 4px, #9c6a3a 4px, #9c6a3a 8px);
+      border-radius: 3px;
+      min-width: 20px
+    }
+
+    /* Decorative car body frames */
+    .car-body {
+      background: rgba(255, 255, 255, .12);
+      border: 2px solid rgba(0, 0, 0, .18);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .car-roof {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .car-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 6px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .chimney-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      flex-shrink: 0;
+    }
+
+    .chimney-cap {
+      width: 22px;
+      height: 8px;
+      background: #4a2c0a;
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* ════════════════ BANK ════════════════ */
+    .bank {
+      background: linear-gradient(180deg, #fffaf0, #fff4e0);
+      border-top: 3px solid var(--yellow);
+      padding: 8px 12px 12px;
+      flex-shrink: 0;
+    }
+
+    .bank-title {
+      font-size: .78rem;
+      font-weight: 900;
+      color: var(--red);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .bank-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      min-height: 90px;
+    }
+
+    /* Figure in bank */
+    .fig-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: grab;
+      flex-shrink: 0;
+      touch-action: none;
+    }
+
+    .fig-wrap:active {
+      cursor: grabbing
+    }
+
+    .fig {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--sh-sm);
+      transition: opacity .25s, transform .15s, box-shadow .15s;
+    }
+
+    .fig:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .22)
+    }
+
+    .fig-used {
+      opacity: .2 !important;
+      pointer-events: none !important
+    }
+
+    .fig-lbl {
+      font-size: .68rem;
+      font-weight: 900;
+      color: #555;
+      white-space: nowrap
+    }
+
+    .rot-deg {
+      font-size: .65rem;
+      font-weight: 900;
+      color: var(--red);
+      letter-spacing: .02em
+    }
+
+    .rot-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--yellow);
+      color: #333;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--sh-sm);
+      border: 2px solid #fff;
+      z-index: 10;
+      transition: transform .25s, background .2s;
+      touch-action: manipulation;
+    }
+
+    .rot-btn:hover {
+      background: #ffa502;
+      transform: rotate(90deg) scale(1.2)
+    }
+
+    /* ════════════════ FOOTER ════════════════ */
+    .game-footer {
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px 14px;
+      background: #fff;
+      border-top: 2px solid #eee;
+      justify-content: center;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .fbtn {
+      color: #fff;
+      font-size: .92rem;
+      font-weight: 800;
+      padding: 11px 24px;
+      border-radius: 50px;
+      box-shadow: var(--sh-sm);
+      transition: background .18s, transform .15s;
+      touch-action: manipulation;
+    }
+
+    .fbtn:hover {
+      transform: scale(1.05)
+    }
+
+    .fbtn-red {
+      background: var(--red)
+    }
+
+    .fbtn-red:hover {
+      background: #c0392b
+    }
+
+    .fbtn-green {
+      background: var(--green)
+    }
+
+    .fbtn-green:hover {
+      background: #0abf53
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    /* ════════════════ MODALS ════════════════ */
+    .modal {
+      background: #fff;
+      border-radius: 26px;
+      padding: 26px 22px 22px;
+      max-width: 360px;
+      width: 92%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      animation: popIn .4s cubic-bezier(.34, 1.56, .64, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-big {
+      max-width: 420px
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(.4) rotate(-8deg);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1) rotate(0);
+        opacity: 1
+      }
+    }
+
+    .modal-confetti {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .confetti-bit {
+      position: absolute;
+      border-radius: 2px;
+      animation: confettiFall linear forwards
+    }
+
+    @keyframes confettiFall {
+      from {
+        transform: translateY(-20px) rotate(0);
+        opacity: 1
+      }
+
+      to {
+        transform: translateY(400px) rotate(540deg);
+        opacity: 0
+      }
+    }
+
+    .big-emoji {
+      font-size: 3rem
+    }
+
+    .big-trophy {
+      font-size: 4rem;
+      animation: trophyWobble 2s ease-in-out infinite
+    }
+
+    @keyframes trophyWobble {
+
+      0%,
+      100% {
+        transform: rotate(-8deg) scale(1)
+      }
+
+      50% {
+        transform: rotate(8deg) scale(1.1)
+      }
+    }
+
+    .modal-h {
+      font-family: var(--ff-h);
+      font-size: clamp(1.5rem, 5vw, 2.1rem);
+      color: var(--red)
+    }
+
+    .modal-p {
+      font-size: .9rem;
+      color: #666;
+      font-weight: 700
+    }
+
+    .big-p {
+      font-size: 1rem;
+      color: #444;
+      font-weight: 800
+    }
+
+    .modal-stars {
+      font-size: 1.9rem;
+      animation: starsBounce .6s ease .2s both
+    }
+
+    @keyframes starsBounce {
+      from {
+        transform: scale(0);
+        opacity: 0
+      }
+
+      70% {
+        transform: scale(1.4)
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px
+    }
+
+    .pbtn {
+      background: var(--red);
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 800;
+      padding: 11px 22px;
+      border-radius: 50px;
+      box-shadow: var(--sh-sm);
+      transition: background .18s, transform .15s;
+      touch-action: manipulation;
+    }
+
+    .pbtn:hover {
+      background: #c0392b;
+      transform: scale(1.05)
+    }
+
+    .pbtn-gray {
+      background: #aaa
+    }
+
+    .pbtn-gray:hover {
+      background: #888
+    }
+
+    .pbtn-big {
+      font-size: 1.05rem;
+      padding: 13px 30px;
+      margin-top: 4px
+    }
+
+    .train-ride-box {
+      overflow: hidden;
+      width: 100%;
+      height: 52px;
+      position: relative
+    }
+
+    .train-ride {
+      position: absolute;
+      font-size: 2.2rem;
+      animation: trainRide 3s linear infinite;
+      white-space: nowrap;
+      bottom: 0
+    }
+
+    @keyframes trainRide {
+      from {
+        transform: translateX(-130%)
+      }
+
+      to {
+        transform: translateX(110%)
+      }
+    }
+
+    .rainbow-text {
+      background: linear-gradient(90deg, #ff4757, #ff9f43, #ffd700, #2ed573, #48dbfb, #a55eea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbowShift 3s linear infinite;
+      background-size: 200%;
+    }
+
+    @keyframes rainbowShift {
+      from {
+        background-position: 0%
+      }
+
+      to {
+        background-position: 200%
+      }
+    }
+
+    .firework-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0
+    }
+
+    .fw {
+      position: absolute;
+      font-size: 2.5rem;
+      animation: fwPop 1.3s ease-out forwards
+    }
+
+    @keyframes fwPop {
+      0% {
+        transform: scale(0) rotate(0);
+        opacity: 1
+      }
+
+      60% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1
+      }
+
+      100% {
+        transform: scale(.4) rotate(360deg);
+        opacity: 0
+      }
+    }
+
+    /* ════════════════ GHOST ════════════════ */
+    .ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+      opacity: .85;
+      transform: scale(1.15);
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, .35))
+    }
+
+    /* ════════════════ TOAST ════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: #ff4757;
+      color: #fff;
+      font-weight: 800;
+      font-size: .92rem;
+      padding: 10px 22px;
+      border-radius: 50px;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 500;
+      white-space: normal;
+      max-width: 88vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* ════════════════ RESPONSIVE ════════════════ */
+    @media(max-width:480px) {
+      .slot[data-shape="circle"] {
+        width: 50px;
+        height: 50px
+      }
+
+      .slot[data-shape="square"] {
+        width: 50px;
+        height: 50px
+      }
+
+      .slot[data-shape="rectangle"] {
+        width: 84px;
+        height: 44px
+      }
+
+      .slot[data-shape="triangle"] {
+        width: 54px;
+        height: 50px
+      }
+
+      .bank-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        justify-content: flex-start
+      }
+
+      .bank-row::-webkit-scrollbar {
+        height: 8px
+      }
+
+      .bank-row::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, .12);
+        border-radius: 6px
+      }
+
+      .icon-btn {
+        width: 48px;
+        height: 48px
+      }
+
+      .fbtn {
+        padding: 12px 20px;
+        font-size: 1rem
+      }
+
+      .card {
+        min-width: 100px;
+        max-width: 138px;
+        padding: 11px 8px
+      }
+
+      .card-tip {
+        display: none
+      }
+    }
+
+    @keyframes smokePuff {
+      0% {
+        transform: scale(.4) translateY(0);
+        opacity: .7
+      }
+
+      100% {
+        transform: scale(2.2) translateY(-55px);
+        opacity: 0
+      }
+    }
+
+    .slot-correct-flash {
+      animation: cFlash .5s ease !important
+    }
+
+    @keyframes cFlash {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 213, 115, 0)
+      }
+
+      50% {
+        box-shadow: 0 0 0 14px rgba(46, 213, 115, .3)
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ══════ MENU ══════ -->
-<div id="screen-menu" class="screen active">
-  <div class="cloud-layer" aria-hidden="true">
-    <span class="cloud" style="top:8%;left:3%;font-size:2.8rem;animation-delay:0s">☁️</span>
-    <span class="cloud" style="top:15%;left:60%;font-size:2rem;animation-delay:3s">☁️</span>
-    <span class="cloud" style="top:5%;left:33%;font-size:3.2rem;animation-delay:6s">☁️</span>
-  </div>
-  <div class="menu-wrap">
-    <div class="menu-emoji">🚂</div>
-    <h1 class="menu-title">GeoTren</h1>
-    <p class="menu-sub">¡Arma tu tren con figuras geométricas!</p>
-    <div class="menu-cards">
-      <button class="card" onclick="startLevel(1)">
-        <span class="card-star">⭐</span>
-        <span class="card-num">Nivel 1</span>
-        <span class="card-name">Reconocimiento</span>
-        <span class="card-tip">¿Qué figura va aquí?</span>
-      </button>
-      <button class="card" onclick="startLevel(2)">
-        <span class="card-star">⭐⭐</span>
-        <span class="card-num">Nivel 2</span>
-        <span class="card-name">Ubicación</span>
-        <span class="card-tip">Paso a paso guiado</span>
-      </button>
-      <button class="card" onclick="startLevel(3)">
-        <span class="card-star">⭐⭐⭐</span>
-        <span class="card-num">Nivel 3</span>
-        <span class="card-name">Rotación</span>
-        <span class="card-tip">¡Gira las figuras!</span>
-      </button>
+  <!-- ══════ MENU ══════ -->
+  <div id="screen-menu" class="screen active">
+    <div class="cloud-layer" aria-hidden="true">
+      <span class="cloud" style="top:8%;left:3%;font-size:2.8rem;animation-delay:0s">☁️</span>
+      <span class="cloud" style="top:15%;left:60%;font-size:2rem;animation-delay:3s">☁️</span>
+      <span class="cloud" style="top:5%;left:33%;font-size:3.2rem;animation-delay:6s">☁️</span>
     </div>
-    <button class="sound-btn" id="menuSoundBtn" onclick="toggleSound()">🔊 Sonido: ON</button>
-    <p class="menu-credit">Juego educativo para primaria 🎒</p>
-    <p class="menu-authors">✨ Carol Güiza &amp; Angy Pineda ✨</p>
-  </div>
-  <div class="menu-rail-bottom" aria-hidden="true"></div>
-</div>
-
-<!-- ══════ GAME ══════ -->
-<div id="screen-game" class="screen">
-  <div class="top-bar">
-    <button class="icon-btn" onclick="goMenu()">🏠</button>
-    <div class="top-center">
-      <span class="lvl-tag" id="lvlTag">Nivel 1</span>
-      <div class="bulbs" id="bulbs"></div>
+    <div class="menu-wrap">
+      <div class="menu-emoji">🚂</div>
+      <h1 class="menu-title">GeoTren</h1>
+      <p class="menu-sub">¡Arma tu tren con figuras geométricas!</p>
+      <div class="menu-cards">
+        <button class="card" onclick="startLevel(1)">
+          <span class="card-star">⭐</span>
+          <span class="card-num">Nivel 1</span>
+          <span class="card-name">Reconocimiento</span>
+          <span class="card-tip">¿Qué figura va aquí?</span>
+        </button>
+        <button class="card" onclick="startLevel(2)">
+          <span class="card-star">⭐⭐</span>
+          <span class="card-num">Nivel 2</span>
+          <span class="card-name">Ubicación</span>
+          <span class="card-tip">Paso a paso guiado</span>
+        </button>
+        <button class="card" onclick="startLevel(3)">
+          <span class="card-star">⭐⭐⭐</span>
+          <span class="card-num">Nivel 3</span>
+          <span class="card-name">Rotación</span>
+          <span class="card-tip">¡Gira las figuras!</span>
+        </button>
+      </div>
+      <button class="sound-btn" id="menuSoundBtn" onclick="toggleSound()">🔊 Sonido: ON</button>
+      <p class="menu-credit">Juego educativo para primaria 🎒</p>
+      <p class="menu-authors">✨ Carol Güiza &amp; Angy Pineda ✨</p>
     </div>
-    <button class="icon-btn" id="gameSoundBtn" onclick="toggleSound()">🔊</button>
+    <div class="menu-rail-bottom" aria-hidden="true"></div>
   </div>
 
-  <div class="instr" id="instr" role="status" aria-live="polite">
-    ¡Arrastra las figuras al tren!
-  </div>
-
-  <div class="scene" id="scene">
-    <div class="sky-clouds" aria-hidden="true">
-      <span class="scloud" style="animation-delay:0s;left:5%">☁️</span>
-      <span class="scloud" style="animation-delay:6s;left:40%">☁️</span>
-      <span class="scloud" style="animation-delay:12s;left:70%">☁️</span>
+  <!-- ══════ GAME ══════ -->
+  <div id="screen-game" class="screen">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="goMenu()">🏠</button>
+      <div class="top-center">
+        <span class="lvl-tag" id="lvlTag">Nivel 1</span>
+        <div class="bulbs" id="bulbs"></div>
+      </div>
+      <button class="icon-btn" id="gameSoundBtn" onclick="toggleSound()">🔊</button>
     </div>
-    <div class="train-scroll">
-      <div class="train-wrap" id="trainWrap"></div>
+
+    <div class="instr" id="instr" role="status" aria-live="polite">
+      ¡Arrastra las figuras al tren!
     </div>
-  </div>
 
-  <div class="ground" aria-hidden="true">
-    <div class="rail"></div>
-    <div class="rail"></div>
-  </div>
+    <div class="scene" id="scene">
+      <div class="sky-clouds" aria-hidden="true">
+        <span class="scloud" style="animation-delay:0s;left:5%">☁️</span>
+        <span class="scloud" style="animation-delay:6s;left:40%">☁️</span>
+        <span class="scloud" style="animation-delay:12s;left:70%">☁️</span>
+      </div>
+      <div class="train-scroll">
+        <div class="train-wrap" id="trainWrap"></div>
+      </div>
+    </div>
 
-  <div class="bank">
-    <div class="bank-title">📦 Arrastra las figuras al tren</div>
-    <div class="bank-row" id="bankRow" role="list"></div>
-  </div>
+    <div class="ground" aria-hidden="true">
+      <div class="rail"></div>
+      <div class="rail"></div>
+    </div>
 
-  <div class="game-footer">
-    <button class="fbtn fbtn-red" onclick="resetLevel()">🔄 Reiniciar</button>
-    <button class="fbtn fbtn-green hidden" id="nextBtn" onclick="nextLevel()">➡️ Siguiente</button>
-  </div>
-</div>
+    <div class="bank">
+      <div class="bank-title">📦 Arrastra las figuras al tren</div>
+      <div class="bank-row" id="bankRow" role="list"></div>
+    </div>
 
-<!-- ══════ LEVEL DONE ══════ -->
-<div id="screen-lvl" class="screen overlay">
-  <div class="modal">
-    <div class="modal-confetti" id="modalConfetti"></div>
-    <div class="big-emoji">🎉</div>
-    <h2 class="modal-h">¡Nivel Completado!</h2>
-    <p class="modal-p" id="lvlMsg">¡Excelente!</p>
-    <div class="modal-stars" id="modalStars">⭐⭐⭐</div>
-    <div class="modal-btns">
-      <button class="pbtn" onclick="nextLevel()">➡️ Siguiente Nivel</button>
-      <button class="pbtn pbtn-gray" onclick="goMenu()">🏠 Menú</button>
+    <div class="game-footer">
+      <button class="fbtn fbtn-red" onclick="resetLevel()">🔄 Reiniciar</button>
+      <button class="fbtn fbtn-green hidden" id="nextBtn" onclick="nextLevel()">➡️ Siguiente</button>
     </div>
   </div>
-</div>
 
-<!-- ══════ WIN ══════ -->
-<div id="screen-win" class="screen overlay">
-  <div class="firework-bg" id="fwBg"></div>
-  <div class="modal modal-big">
-    <div class="big-trophy">🏆</div>
-    <h2 class="modal-h rainbow-text">¡FELICITACIONES!</h2>
-    <p class="modal-p big-p">¡Construiste el tren completo!</p>
-    <p class="modal-p">¡El GeoTren ya puede viajar por el mundo!</p>
-    <div class="train-ride-box" aria-hidden="true"><div class="train-ride">🚂🚃🚃💨</div></div>
-    <p style="font-size:.85rem;color:#e84e5e;font-weight:900">✨ Carol Güiza &amp; Angy Pineda ✨</p>
-    <button class="pbtn pbtn-big" onclick="goMenu()">🏠 Jugar de Nuevo</button>
+  <!-- ══════ LEVEL DONE ══════ -->
+  <div id="screen-lvl" class="screen overlay">
+    <div class="modal">
+      <div class="modal-confetti" id="modalConfetti"></div>
+      <div class="big-emoji">🎉</div>
+      <h2 class="modal-h">¡Nivel Completado!</h2>
+      <p class="modal-p" id="lvlMsg">¡Excelente!</p>
+      <div class="modal-stars" id="modalStars">⭐⭐⭐</div>
+      <div class="modal-btns">
+        <button class="pbtn" onclick="nextLevel()">➡️ Siguiente Nivel</button>
+        <button class="pbtn pbtn-gray" onclick="goMenu()">🏠 Menú</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- Ghost + Toast -->
-<div id="ghost" class="ghost" aria-hidden="true"></div>
-<div id="toast" class="toast" role="alert"></div>
-
-<script>
-'use strict';
-/* ──────── AUDIO ──────── */
-var AudioCtx=null,soundOn=true;
-function getCtx(){if(!AudioCtx)AudioCtx=new(window.AudioContext||window.webkitAudioContext)();if(AudioCtx.state==='suspended')AudioCtx.resume();return AudioCtx;}
-function tone(f,t,d,v,delay){if(!soundOn)return;delay=delay||0;try{var c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t;o.frequency.value=f;var now=c.currentTime+delay;g.gain.setValueAtTime(v,now);g.gain.exponentialRampToValueAtTime(.001,now+d);o.start(now);o.stop(now+d+.05);}catch(e){}}
-function sndSuccess(){[523,659,784,1047].forEach(function(f,i){tone(f,'sine',.3,.22,i*.09)});}
-function sndError(){tone(220,'sawtooth',.25,.18,0);tone(180,'sawtooth',.2,.12,.14);}
-function sndLevelUp(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,'sine',.38,.26,i*.1)});}
-function sndWhistle(){[900,1100,900,700,1100,900].forEach(function(f,i){tone(f,'sine',.22,.3,i*.18)});}
-function sndRotate(){tone(660,'sine',.1,.14,0);}
-
-/* ──────── COLORS / NAMES ──────── */
-var SHAPE_COLORS={circle:'#e84e5e',square:'#1E90FF',rectangle:'#FFA502',triangle:'#FECA57'};
-var SHAPE_NAMES={circle:'Círculo',square:'Cuadrado',rectangle:'Rectángulo',triangle:'Triángulo'};
-
-/* ══════════════════════════════════════
-   LEVEL DEFINITIONS
-   Each slot: { id, shape, label }
-   Levels 1-2: no rotation needed
-   Level 3: rotation required
-   Level 4: free (same as 3 structure)
-══════════════════════════════════════ */
-var LEVELS = {
-  // LEVEL 1: Locomotora (chimenea, ventana, cuerpo, 2 ruedas) + 1 vagón (techo triángulo, cuerpo rect, 2 ruedas)
-  1: {
-    slots:[
-      {id:'loco-chimney', shape:'rectangle', label:'Chimenea'},
-      {id:'loco-win',     shape:'square',    label:'Ventana'},
-      {id:'loco-body',    shape:'rectangle', label:'Cuerpo'},
-      {id:'loco-whl1',    shape:'circle',    label:'Rueda Izq'},
-      {id:'loco-whl2',    shape:'circle',    label:'Rueda Der'},
-      {id:'wag-roof',     shape:'triangle',  label:'Techo V'},
-      {id:'wag-body',     shape:'rectangle', label:'Cuerpo V'},
-      {id:'wag-whl1',     shape:'circle',    label:'Rueda Izq'},
-      {id:'wag-whl2',     shape:'circle',    label:'Rueda Der'},
-    ],
-    // Guided steps for level 2
-    steps: null
-  },
-  // LEVEL 2: Same shape count as level 1 but GUIDED
-  2: {
-    slots:[
-      {id:'loco-chimney', shape:'rectangle', label:'Chimenea'},
-      {id:'loco-win',     shape:'square',    label:'Ventana'},
-      {id:'loco-body',    shape:'rectangle', label:'Cuerpo'},
-      {id:'loco-whl1',    shape:'circle',    label:'Rueda Izq'},
-      {id:'loco-whl2',    shape:'circle',    label:'Rueda Der'},
-      {id:'wag-roof',     shape:'triangle',  label:'Techo V'},
-      {id:'wag-body',     shape:'rectangle', label:'Cuerpo V'},
-      {id:'wag-whl1',     shape:'circle',    label:'Rueda Izq'},
-      {id:'wag-whl2',     shape:'circle',    label:'Rueda Der'},
-    ],
-    steps:[
-      {html:'🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>IZQUIERDA</b> <span class="arrow">←</span> de la locomotora', shape:'circle', slot:'loco-whl1'},
-      {html:'🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>DERECHA</b> <span class="arrow">→</span> de la locomotora',  shape:'circle', slot:'loco-whl2'},
-      {html:'🟦 Coloca el <b>CUADRADO</b> en la <b>VENTANA</b> de la cabina',                                        shape:'square', slot:'loco-win'},
-      {html:'🟧 Coloca el <b>RECTÁNGULO</b> en el <b>CUERPO</b> de la locomotora',                                  shape:'rectangle', slot:'loco-body'},
-      {html:'🟧 Coloca el <b>RECTÁNGULO</b> como <b>CHIMENEA</b> (arriba ↑)',                                        shape:'rectangle', slot:'loco-chimney'},
-      {html:'🔺 Coloca el <b>TRIÁNGULO</b> como <b>TECHO</b> del vagón (arriba ↑)',                                  shape:'triangle',  slot:'wag-roof'},
-      {html:'🟧 Coloca el <b>RECTÁNGULO</b> en el <b>CUERPO</b> del vagón',                                         shape:'rectangle', slot:'wag-body'},
-      {html:'🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>IZQUIERDA</b> <span class="arrow">←</span> del vagón',      shape:'circle',    slot:'wag-whl1'},
-      {html:'🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>DERECHA</b> <span class="arrow">→</span> del vagón',        shape:'circle',    slot:'wag-whl2'},
-    ]
-  },
-  // LEVEL 3: Complex loco (nose-triangle, 2 chimneys, window, roof-triangle, body) + 2 wagons. Rotation required.
-  3: {
-    slots:[
-      {id:'loco-nose',    shape:'triangle',  label:'Corta-Hielo'},
-      {id:'loco-chi1',    shape:'rectangle', label:'Chimenea 1'},
-      {id:'loco-chi2',    shape:'rectangle', label:'Chimenea 2'},
-      {id:'loco-win',     shape:'square',    label:'Ventana'},
-      {id:'loco-roof',    shape:'triangle',  label:'Techo Cabina'},
-      {id:'loco-body',    shape:'rectangle', label:'Cuerpo'},
-      {id:'loco-whl1',    shape:'circle',    label:'Rueda Izq'},
-      {id:'loco-whl2',    shape:'circle',    label:'Rueda Der'},
-      {id:'wag1-roof',    shape:'triangle',  label:'Techo V1'},
-      {id:'wag1-body',    shape:'rectangle', label:'Cuerpo V1'},
-      {id:'wag1-whl1',    shape:'circle',    label:'Rueda V1 Izq'},
-      {id:'wag1-whl2',    shape:'circle',    label:'Rueda V1 Der'},
-      {id:'wag2-roof',    shape:'triangle',  label:'Techo V2'},
-      {id:'wag2-body',    shape:'rectangle', label:'Cuerpo V2'},
-      {id:'wag2-whl1',    shape:'circle',    label:'Rueda V2 Izq'},
-      {id:'wag2-whl2',    shape:'circle',    label:'Rueda V2 Der'},
-    ],
-    steps: null
-  }
-};
-
-// Valid rotations per slot for level 3
-// Triangles always accept any angle (0,90,180,270) — all triangles are equivalent shapes
-// Only rectangles have orientation constraints
-var VALID_ROTS = {
-  // Rectangles: chimneys must be vertical, bodies must be horizontal
-  'loco-chi1':  [90,270],
-  'loco-chi2':  [90,270],
-  'loco-body':  [0,180],
-  'wag1-body':  [0,180],
-  'wag2-body':  [0,180],
-  'wag-body':   [0,180],
-  // All triangle slots accept any rotation
-  'loco-nose':  [0,90,180,270],
-  'loco-roof':  [0,90,180,270],
-  'wag1-roof':  [0,90,180,270],
-  'wag2-roof':  [0,90,180,270],
-  'wag-roof':   [0,90,180,270],
-  // Default: accept all angles
-  'default':    [0,90,180,270]
-};
-
-/* ──────── STATE ──────── */
-var G={level:1,step:0,correct:0,total:0,slots:{},figs:{}};
-
-/* ──────── START / NAV ──────── */
-function startLevel(n){
-  G.level=n; G.step=0; G.correct=0;
-  var lvlDef=LEVELS[n];
-  G.total=lvlDef.slots.length;
-  G.slots={};
-  lvlDef.slots.forEach(function(s){G.slots[s.id]={shape:s.shape,filled:false};});
-  document.getElementById('lvlTag').textContent=
-    n===1?'Nivel 1 – Reconocimiento':
-    n===2?'Nivel 2 – Ubicación':
-    'Nivel 3 – Rotación';
-  document.getElementById('nextBtn').classList.add('hidden');
-  buildTrainHTML();
-  buildBulbs();
-  buildBank();
-  setInstruction();
-  showScreen('screen-game');
-}
-function resetLevel(){startLevel(G.level);}
-function nextLevel(){if(G.level<3)startLevel(G.level+1);else showWin();}
-function goMenu(){showScreen('screen-menu');stopFireworks();}
-function toggleSound(){
-  soundOn=!soundOn;
-  var txt=soundOn?'🔊 Sonido: ON':'🔇 Sonido: OFF';
-  var mb=document.getElementById('menuSoundBtn');
-  var gb=document.getElementById('gameSoundBtn');
-  if(mb){mb.textContent=txt;mb.classList.toggle('off',!soundOn);}
-  if(gb)gb.textContent=soundOn?'🔊':'🔇';
-}
-
-/* ════════════════════════════════════
-   SVG SHAPE GENERATORS
-   These return SVG strings for figures
-════════════════════════════════════ */
-function svgCircle(color){
-  return '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">'
-    +'<defs><radialGradient id="cg" cx="38%" cy="32%"><stop offset="0%" stop-color="#fff" stop-opacity=".6"/><stop offset="100%" stop-color="'+color+'"/></radialGradient></defs>'
-    +'<circle cx="30" cy="30" r="26" fill="url(#cg)" stroke="rgba(0,0,0,.4)" stroke-width="3"/>'
-    +'<circle cx="30" cy="30" r="6" fill="rgba(0,0,0,.25)"/>'
-    +'<line x1="30" y1="4" x2="30" y2="56" stroke="rgba(0,0,0,.18)" stroke-width="2"/>'
-    +'<line x1="4" y1="30" x2="56" y2="30" stroke="rgba(0,0,0,.18)" stroke-width="2"/>'
-    +'<circle cx="30" cy="30" r="3" fill="#333"/>'
-    +'</svg>';
-}
-function svgSquare(color){
-  return '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">'
-    +'<defs><linearGradient id="sg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="'+color+'"/><stop offset="100%" stop-color="rgba(0,0,0,.25)" stop-opacity=".3"/></linearGradient></defs>'
-    +'<rect x="4" y="4" width="52" height="52" rx="8" fill="url(#sg)" stroke="rgba(0,0,0,.3)" stroke-width="3"/>'
-    +'<rect x="12" y="12" width="36" height="36" rx="4" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>'
-    +'</svg>';
-}
-function svgRect(color,rot){
-  // Taller (vertical) or wider (horizontal)
-  var w=100,h=48;
-  var gid='rg'+Math.random().toString(36).slice(2);
-  return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'
-    +'<defs><linearGradient id="'+gid+'" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="'+color+'"/><stop offset="100%" stop-color="rgba(0,0,0,.2)" stop-opacity=".35"/></linearGradient></defs>'
-    +'<rect x="3" y="3" width="'+(w-6)+'" height="'+(h-6)+'" rx="10" fill="url(#'+gid+')" stroke="rgba(0,0,0,.3)" stroke-width="3"/>'
-    +'<rect x="10" y="8" width="'+(w-20)+'" height="'+(h-16)+'" rx="6" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>'
-    +'</svg>';
-}
-function svgTriangle(color,rot){
-  var gid='tg'+Math.random().toString(36).slice(2);
-  return '<svg viewBox="0 0 60 54" xmlns="http://www.w3.org/2000/svg" style="transform:rotate('+rot+'deg);transform-origin:50% 50%">'
-    +'<defs><linearGradient id="'+gid+'" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="'+color+'"/><stop offset="100%" stop-color="rgba(0,0,0,.2)" stop-opacity=".3"/></linearGradient></defs>'
-    +'<polygon points="30,4 56,50 4,50" fill="url(#'+gid+')" stroke="rgba(0,0,0,.3)" stroke-width="2.5" stroke-linejoin="round"/>'
-    +'</svg>';
-}
-
-/* Make slot hint SVG */
-function hintSVG(shape){
-  var c='rgba(0,0,0,.3)';
-  if(shape==='circle') return '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="'+c+'" stroke-width="3" stroke-dasharray="6,4"/></svg>';
-  if(shape==='square') return '<svg viewBox="0 0 60 60"><rect x="6" y="6" width="48" height="48" rx="6" fill="none" stroke="'+c+'" stroke-width="3" stroke-dasharray="6,4"/></svg>';
-  if(shape==='rectangle') return '<svg viewBox="0 0 100 48"><rect x="4" y="4" width="92" height="40" rx="8" fill="none" stroke="'+c+'" stroke-width="3" stroke-dasharray="6,4"/></svg>';
-  if(shape==='triangle') return '<svg viewBox="0 0 60 54"><polygon points="30,4 56,50 4,50" fill="none" stroke="'+c+'" stroke-width="3" stroke-dasharray="6,4"/></svg>';
-  return '';
-}
-
-/* ════════════════════════════════════
-   MAKE SLOT ELEMENT
-════════════════════════════════════ */
-function makeSlot(slotId){
-  var lvlDef=LEVELS[G.level];
-  var def=lvlDef.slots.filter(function(s){return s.id===slotId;})[0];
-  if(!def) return document.createElement('div');
-  var d=document.createElement('div');
-  d.className='slot';
-  d.dataset.slotId=slotId;
-  d.dataset.shape=def.shape;
-  // hint
-  var hint=document.createElement('div');
-  hint.className='slot-hint';
-  hint.innerHTML=hintSVG(def.shape);
-  d.appendChild(hint);
-  // label
-  var lbl=document.createElement('span');
-  lbl.className='slot-lbl';
-  lbl.textContent=def.label;
-  d.appendChild(lbl);
-  return d;
-}
-
-/* ════════════════════════════════════
-   BUILD TRAIN HTML — one function per level
-════════════════════════════════════ */
-function buildTrainHTML(){
-  var wrap=document.getElementById('trainWrap');
-  wrap.innerHTML='';
-  if(G.level===1) buildTrain1(wrap);
-  else if(G.level===2) buildTrain2(wrap);
-  else buildTrain34(wrap);
-}
-
-/* Helper: connector between cars */
-function connector(){
-  var c=document.createElement('div');
-  c.className='connector';
-  c.innerHTML='<div class="conn-dot"></div><div class="conn-bar"></div><div class="conn-dot"></div>';
-  return c;
-}
-
-/* ── LEVEL 1: Simple loco (red/orange) + 1 wagon ── */
-function buildTrain1(wrap){
-  // Colors: warm red loco
-  var locoColor='#e84e5e';
-  var wagColor='#1E90FF';
-
-  // Loco car
-  var loco=document.createElement('div');
-  loco.id='trainLoco';
-  loco.className='train-car';
-  loco.style.cssText='background:'+locoColor+';border-radius:12px 24px 12px 12px;padding:6px 10px 6px 10px;min-width:110px;position:relative;border:3px solid rgba(0,0,0,.2)';
-
-  // Chimney area
-  var chiBox=document.createElement('div');
-  chiBox.style.cssText='display:flex;justify-content:flex-end;padding-right:8px;margin-bottom:2px';
-  var chiTop=document.createElement('div');
-  chiTop.style.cssText='width:20px;height:8px;background:#8B3A3A;border-radius:4px 4px 0 0;margin-right:2px';
-  chiBox.appendChild(chiTop);
-  chiBox.appendChild(makeSlot('loco-chimney'));
-  loco.appendChild(chiBox);
-
-  // Face + window
-  var topRow=document.createElement('div');
-  topRow.style.cssText='display:flex;align-items:center;gap:6px;justify-content:space-between';
-  var face=document.createElement('div');
-  face.innerHTML='<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#FFDDB6" stroke="#a67c52" stroke-width="1.5"/><circle cx="14" cy="17" r="2.5" fill="#333"/><circle cx="26" cy="17" r="2.5" fill="#333"/><path d="M14 26 Q20 30 26 26" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
-  topRow.appendChild(face);
-  topRow.appendChild(makeSlot('loco-win'));
-  loco.appendChild(topRow);
-
-  // Body
-  var bodyRow=document.createElement('div');
-  bodyRow.style.cssText='margin:4px 0;display:flex;justify-content:center';
-  bodyRow.appendChild(makeSlot('loco-body'));
-  loco.appendChild(bodyRow);
-
-  // Base bar
-  var base=document.createElement('div');
-  base.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  loco.appendChild(base);
-
-  // Wheels
-  var wheels=document.createElement('div');
-  wheels.className='wheels-row';
-  wheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wheels.appendChild(makeSlot('loco-whl1'));
-  var axle=document.createElement('div'); axle.className='axle'; axle.style.width='20px';
-  wheels.appendChild(axle);
-  wheels.appendChild(makeSlot('loco-whl2'));
-  loco.appendChild(wheels);
-  wrap.appendChild(loco);
-  wrap.appendChild(connector());
-
-  // Wagon
-  var wag=document.createElement('div');
-  wag.id='trainWagon';
-  wag.className='train-car';
-  wag.style.cssText='background:'+wagColor+';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
-
-  var roofRow=document.createElement('div');
-  roofRow.style.cssText='display:flex;justify-content:center;margin-bottom:2px';
-  roofRow.appendChild(makeSlot('wag-roof'));
-  wag.appendChild(roofRow);
-
-  var wbody=document.createElement('div');
-  wbody.style.cssText='display:flex;justify-content:center;margin:4px 0';
-  wbody.appendChild(makeSlot('wag-body'));
-  wag.appendChild(wbody);
-
-  var wbase=document.createElement('div');
-  wbase.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  wag.appendChild(wbase);
-
-  var wwheels=document.createElement('div');
-  wwheels.className='wheels-row';
-  wwheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wwheels.appendChild(makeSlot('wag-whl1'));
-  var axle2=document.createElement('div'); axle2.className='axle'; axle2.style.width='20px';
-  wwheels.appendChild(axle2);
-  wwheels.appendChild(makeSlot('wag-whl2'));
-  wag.appendChild(wwheels);
-  wrap.appendChild(wag);
-}
-
-/* ── LEVEL 2: Green loco + 1 wagon (guided) ── */
-function buildTrain2(wrap){
-  var locoColor='#2ed573';
-  var wagColor='#ffa502';
-
-  var loco=document.createElement('div');
-  loco.id='trainLoco';
-  loco.className='train-car';
-  loco.style.cssText='background:'+locoColor+';border-radius:12px 24px 12px 12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
-
-  var chiBox=document.createElement('div');
-  chiBox.style.cssText='display:flex;justify-content:flex-end;padding-right:8px;margin-bottom:2px';
-  var chiTop=document.createElement('div');
-  chiTop.style.cssText='width:20px;height:8px;background:#1a7a45;border-radius:4px 4px 0 0;margin-right:2px';
-  chiBox.appendChild(chiTop);
-  chiBox.appendChild(makeSlot('loco-chimney'));
-  loco.appendChild(chiBox);
-
-  var topRow=document.createElement('div');
-  topRow.style.cssText='display:flex;align-items:center;gap:6px;justify-content:space-between';
-  var face=document.createElement('div');
-  face.innerHTML='<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#FFDDB6" stroke="#a67c52" stroke-width="1.5"/><circle cx="14" cy="17" r="2.5" fill="#333"/><circle cx="26" cy="17" r="2.5" fill="#333"/><path d="M14 26 Q20 30 26 26" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
-  topRow.appendChild(face);
-  topRow.appendChild(makeSlot('loco-win'));
-  loco.appendChild(topRow);
-
-  var bodyRow=document.createElement('div');
-  bodyRow.style.cssText='margin:4px 0;display:flex;justify-content:center';
-  bodyRow.appendChild(makeSlot('loco-body'));
-  loco.appendChild(bodyRow);
-
-  var base=document.createElement('div');
-  base.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  loco.appendChild(base);
-
-  var wheels=document.createElement('div');
-  wheels.className='wheels-row';
-  wheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wheels.appendChild(makeSlot('loco-whl1'));
-  var axle=document.createElement('div'); axle.className='axle'; axle.style.width='20px';
-  wheels.appendChild(axle);
-  wheels.appendChild(makeSlot('loco-whl2'));
-  loco.appendChild(wheels);
-  wrap.appendChild(loco);
-  wrap.appendChild(connector());
-
-  var wag=document.createElement('div');
-  wag.id='trainWagon';
-  wag.className='train-car';
-  wag.style.cssText='background:'+wagColor+';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
-
-  var roofRow=document.createElement('div');
-  roofRow.style.cssText='display:flex;justify-content:center;margin-bottom:2px';
-  roofRow.appendChild(makeSlot('wag-roof'));
-  wag.appendChild(roofRow);
-
-  var wbody=document.createElement('div');
-  wbody.style.cssText='display:flex;justify-content:center;margin:4px 0';
-  wbody.appendChild(makeSlot('wag-body'));
-  wag.appendChild(wbody);
-
-  var wbase=document.createElement('div');
-  wbase.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  wag.appendChild(wbase);
-
-  var wwheels=document.createElement('div');
-  wwheels.className='wheels-row';
-  wwheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wwheels.appendChild(makeSlot('wag-whl1'));
-  var axle2=document.createElement('div'); axle2.className='axle'; axle2.style.width='20px';
-  wwheels.appendChild(axle2);
-  wwheels.appendChild(makeSlot('wag-whl2'));
-  wag.appendChild(wwheels);
-  wrap.appendChild(wag);
-}
-
-/* ── LEVELS 3 & 4: Purple/dark loco + 2 wagons ── */
-function buildTrain34(wrap){
-  var locoColor='#6c5ce7';
-  var wag1Color='#a55eea';
-  var wag2Color='#fd79a8';
-
-  // LOCO
-  var loco=document.createElement('div');
-  loco.id='trainLoco';
-  loco.className='train-car';
-  loco.style.cssText='background:'+locoColor+';border-radius:12px 28px 12px 12px;padding:6px 10px;min-width:130px;border:3px solid rgba(0,0,0,.22);position:relative';
-
-  // Nose (corta-hielo) — left side triangle slot
-  var noseRow=document.createElement('div');
-  noseRow.style.cssText='display:flex;align-items:center;margin-bottom:3px;gap:4px';
-  var noseLbl=document.createElement('span');
-  noseLbl.style.cssText='font-size:.6rem;font-weight:900;color:rgba(255,255,255,.7);writing-mode:horizontal-tb';
-  noseLbl.textContent='◀';
-  noseRow.appendChild(noseLbl);
-  noseRow.appendChild(makeSlot('loco-nose'));
-  loco.appendChild(noseRow);
-
-  // Two chimneys
-  var chiRow=document.createElement('div');
-  chiRow.style.cssText='display:flex;gap:6px;justify-content:flex-end;margin-bottom:2px';
-  var ct1=document.createElement('div'); ct1.style.cssText='width:14px;height:7px;background:#3a2c8a;border-radius:4px 4px 0 0';
-  var ct2=document.createElement('div'); ct2.style.cssText='width:14px;height:7px;background:#3a2c8a;border-radius:4px 4px 0 0';
-  chiRow.appendChild(ct1); chiRow.appendChild(makeSlot('loco-chi1'));
-  chiRow.appendChild(ct2); chiRow.appendChild(makeSlot('loco-chi2'));
-  loco.appendChild(chiRow);
-
-  // Roof triangle + window
-  var midRow=document.createElement('div');
-  midRow.style.cssText='display:flex;align-items:center;gap:6px;justify-content:space-between';
-  midRow.appendChild(makeSlot('loco-roof'));
-  midRow.appendChild(makeSlot('loco-win'));
-  loco.appendChild(midRow);
-
-  // Body
-  var brow=document.createElement('div');
-  brow.style.cssText='margin:4px 0;display:flex;justify-content:center';
-  brow.appendChild(makeSlot('loco-body'));
-  loco.appendChild(brow);
-
-  var base=document.createElement('div');
-  base.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  loco.appendChild(base);
-
-  var wheels=document.createElement('div');
-  wheels.className='wheels-row';
-  wheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wheels.appendChild(makeSlot('loco-whl1'));
-  var axle=document.createElement('div'); axle.className='axle'; axle.style.width='20px';
-  wheels.appendChild(axle);
-  wheels.appendChild(makeSlot('loco-whl2'));
-  loco.appendChild(wheels);
-  wrap.appendChild(loco);
-  wrap.appendChild(connector());
-
-  // WAG 1
-  wrap.appendChild(buildWagon('trainWagon1', wag1Color, 'wag1-roof','wag1-body','wag1-whl1','wag1-whl2'));
-  wrap.appendChild(connector());
-
-  // WAG 2
-  wrap.appendChild(buildWagon('trainWagon2', wag2Color, 'wag2-roof','wag2-body','wag2-whl1','wag2-whl2'));
-}
-
-function buildWagon(id, color, roofId, bodyId, whl1Id, whl2Id){
-  var wag=document.createElement('div');
-  wag.id=id;
-  wag.className='train-car';
-  wag.style.cssText='background:'+color+';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
-
-  var roofRow=document.createElement('div');
-  roofRow.style.cssText='display:flex;justify-content:center;margin-bottom:2px';
-  roofRow.appendChild(makeSlot(roofId));
-  wag.appendChild(roofRow);
-
-  var wbody=document.createElement('div');
-  wbody.style.cssText='display:flex;justify-content:center;margin:4px 0';
-  wbody.appendChild(makeSlot(bodyId));
-  wag.appendChild(wbody);
-
-  var wbase=document.createElement('div');
-  wbase.style.cssText='height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
-  wag.appendChild(wbase);
-
-  var wwheels=document.createElement('div');
-  wwheels.className='wheels-row';
-  wwheels.style.cssText='justify-content:center;gap:12px;padding:4px 0';
-  wwheels.appendChild(makeSlot(whl1Id));
-  var axle=document.createElement('div'); axle.className='axle'; axle.style.width='20px';
-  wwheels.appendChild(axle);
-  wwheels.appendChild(makeSlot(whl2Id));
-  wag.appendChild(wwheels);
-  return wag;
-}
-
-/* ════════════════════════════════════
-   BANK OF FIGURES
-════════════════════════════════════ */
-function buildBank(){
-  var row=document.getElementById('bankRow');
-  row.innerHTML='';
-  G.figs={};
-  var list=makeFigList();
-  list=shuffle(list);
-  list.forEach(function(f,i){
-    var id='fig'+i;
-    var color=SHAPE_COLORS[f.shape];
-    G.figs[id]={shape:f.shape,color:color,rot:f.rot,used:false,el:null};
-    var wrap=document.createElement('div');
-    wrap.className='fig-wrap'; wrap.id='fw_'+id;
-    var figEl=document.createElement('div');
-    figEl.className='fig'; figEl.dataset.figId=id;
-    G.figs[id].el=figEl;
-    figEl.innerHTML=makeFigHTML(f.shape,color,f.rot,id);
-    // rotate button (level 3 only, only for rectangles — triangles can go anywhere)
-    var canRot=(f.shape==='rectangle');
-    if(G.level===3&&canRot){
-      var rb=document.createElement('button');
-      rb.className='rot-btn'; rb.title='Rotar'; rb.setAttribute('aria-label','Rotar figura'); rb.textContent='🔄';
-      (function(fid){
-        rb.addEventListener('click',function(e){e.stopPropagation();rotateFig(fid);});
-        rb.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();rotateFig(fid);});
-      })(id);
-      figEl.appendChild(rb);
-    }
-    wrap.appendChild(figEl);
-    wrap.appendChild(createElement('span','fig-lbl',SHAPE_NAMES[f.shape]));
-    if(G.level===3&&canRot){
-      var degEl=createElement('span','rot-deg',f.rot+'°');
-      degEl.id='deg_'+id;
-      wrap.appendChild(degEl);
-    }
-    DragEngine.attach(wrap,id);
-    row.appendChild(wrap);
-  });
-}
-
-function makeFigHTML(shape,color,rot,id){
-  var w=60,h=60;
-  if(shape==='rectangle'){w=90;h=44;}
-  if(shape==='triangle'){w=60;h=54;}
-  var inner='';
-  if(shape==='circle') inner=svgCircle(color);
-  else if(shape==='square') inner=svgSquare(color);
-  else if(shape==='rectangle') inner=svgRect(color,rot);
-  else if(shape==='triangle') inner=svgTriangle(color,rot);
-  return '<div id="shape_'+id+'" style="width:'+w+'px;height:'+h+'px;display:flex;align-items:center;justify-content:center">'+inner+'</div>';
-}
-
-function makeFigList(){
-  var lvlDef=LEVELS[G.level];
-  if(G.level===1){
-    // all pieces needed + 2 extras (one extra circle, one extra triangle as distractors)
-    var out=lvlDef.slots.map(function(s){return{shape:s.shape,rot:0};});
-    out.push({shape:'circle',rot:0});
-    out.push({shape:'triangle',rot:0});
-    return out;
-  }
-  if(G.level===2){
-    // Guided: show only current step's shape + 2 distractors
-    var step=lvlDef.steps[G.step];
-    var dist=['circle','square','rectangle','triangle'].filter(function(sh){return sh!==step.shape;}).slice(0,2);
-    var out2=[{shape:step.shape,rot:0}];
-    dist.forEach(function(sh){out2.push({shape:sh,rot:0});});
-    return out2;
-  }
-  if(G.level===3){
-    // All needed pieces; rectangles get random rotation, triangles always 0 (they're accepted at any angle)
-    return lvlDef.slots.map(function(s){
-      var r=0;
-      if(s.shape==='rectangle') r=[0,90,180,270][Math.floor(Math.random()*4)];
-      return{shape:s.shape,rot:r};
-    });
-  }
-  return [];
-}
-
-/* ──────── INSTRUCTION ──────── */
-function setInstruction(){
-  var box=document.getElementById('instr');
-  if(G.level===1){
-    box.innerHTML='🚂 <b>Arrastra</b> cada figura al espacio de la <b>misma forma</b>';
-  } else if(G.level===2){
-    var step=LEVELS[2].steps[G.step];
-    box.innerHTML=step.html+'<span class="badge">Paso '+(G.step+1)+' / '+LEVELS[2].steps.length+'</span>';
-    document.querySelectorAll('.slot').forEach(function(s){s.classList.remove('target');});
-    var tgt=document.querySelector('.slot[data-slot-id="'+step.slot+'"]');
-    if(tgt) tgt.classList.add('target');
-  } else if(G.level===3){
-    box.innerHTML='🔄 Presiona <b>🔄</b> para rotar las figuras y colócalas correctamente';
-  } else {
-    box.innerHTML='🛠️ <b>Modo Libre</b> — construye el tren por ti mismo con las piezas disponibles';
-  }
-}
-
-/* ──────── BULBS ──────── */
-function buildBulbs(){
-  var row=document.getElementById('bulbs');
-  row.innerHTML='';
-  var n=Math.min(G.total,12);
-  for(var i=0;i<n;i++){
-    var b=createElement('span','bulb','💡');
-    b.id='b'+i; row.appendChild(b);
-  }
-}
-function lightBulb(i){
-  var b=document.getElementById('b'+i);
-  if(!b) return;
-  b.style.animation='none'; b.offsetHeight;
-  b.classList.add('on');
-}
-
-/* ──────── ROTATE ──────── */
-function rotateFig(figId){
-  var fig=G.figs[figId];
-  if(!fig||fig.used) return;
-  if(fig.shape==='circle'||fig.shape==='square') return;
-  fig.rot=(fig.rot+90)%360;
-  sndRotate();
-  // Re-render the shape inside
-  var shapeDiv=document.getElementById('shape_'+figId);
-  if(shapeDiv){
-    if(fig.shape==='triangle') shapeDiv.innerHTML=svgTriangle(fig.color,fig.rot);
-    else if(fig.shape==='rectangle') shapeDiv.innerHTML=svgRect(fig.color,fig.rot);
-  }
-  var degEl=document.getElementById('deg_'+figId);
-  if(degEl) degEl.textContent=fig.rot+'°';
-}
-
-/* ════════════════════════════════════
-   DROP LOGIC
-════════════════════════════════════ */
-function attemptDrop(figId,slotId){
-  var fig=G.figs[figId];
-  var slot=G.slots[slotId];
-  if(!fig||!slot||slot.filled||fig.used) return;
-  var slotEl=document.querySelector('.slot[data-slot-id="'+slotId+'"]');
-  if(!slotEl||slotEl.classList.contains('filled')) return;
-
-  var valid=false;
-  if(G.level===1){
-    valid=(fig.shape===slot.shape);
-  } else if(G.level===2){
-    var step=LEVELS[2].steps[G.step];
-    valid=(fig.shape===slot.shape)&&(slotId===step.slot);
-  } else {
-    // level 3: triangles accept any angle; rectangles must match orientation
-    if(fig.shape==='triangle'){
-      valid=(fig.shape===slot.shape);
-    } else {
-      var vRots=VALID_ROTS[slotId]||VALID_ROTS['default'];
-      var r=((fig.rot%360)+360)%360;
-      valid=(fig.shape===slot.shape)&&(vRots.indexOf(r)!==-1);
-    }
-  }
-  if(valid) onCorrect(figId,slotId,slotEl,fig,slot);
-  else onError(figId,slotId,slotEl,fig,slot);
-}
-
-function onCorrect(figId,slotId,slotEl,fig,slot){
-  fig.used=true; slot.filled=true; G.correct++;
-  var wrap=document.getElementById('fw_'+figId);
-  if(wrap) wrap.style.opacity='.2';
-  if(fig.el) fig.el.classList.add('fig-used');
-  fillSlot(slotEl,fig);
-  slotEl.classList.remove('target');
-  lightBulb(G.correct-1);
-  sndSuccess();
-  slotEl.classList.add('slot-correct-flash');
-  setTimeout(function(){slotEl.classList.remove('slot-correct-flash');},600);
-  if(G.level===2){
-    G.step++;
-    if(G.step<LEVELS[2].steps.length) setTimeout(function(){buildBank();setInstruction();},500);
-  }
-  setTimeout(checkComplete,350);
-}
-
-function onError(figId,slotId,slotEl,fig,slot){
-  sndError();
-  slotEl.classList.add('error');
-  setTimeout(function(){slotEl.classList.remove('error');},500);
-  var msg='¡Esa figura no encaja ahí! Inténtalo de nuevo 😊';
-  if(G.level===2){
-    var step=LEVELS[2].steps[G.step];
-    if(fig.shape!==slot.shape) msg='¡Necesitas un <b>'+SHAPE_NAMES[step.shape]+'</b>!';
-    else msg='¡Figura correcta, lugar incorrecto! Fíjate en la instrucción 👀';
-  } else if(G.level===3&&fig.shape===slot.shape&&fig.shape==='rectangle'){
-    var vR=VALID_ROTS[slotId]||VALID_ROTS['default'];
-    msg='¡Gira el rectángulo! Ángulos válidos: '+vR.join(', ')+'° 🔄';
-  } else if(fig.shape!==slot.shape){
-    msg='¡Forma incorrecta! Esa es un <b>'+SHAPE_NAMES[fig.shape]+'</b>';
-  }
-  showToast(msg);
-}
-
-function fillSlot(slotEl,fig){
-  slotEl.classList.add('filled');
-  slotEl.innerHTML='';
-  var placed=document.createElement('div');
-  placed.className='placed';
-  var w=60,h=60;
-  if(fig.shape==='rectangle'){w=94;h=44;}
-  if(fig.shape==='triangle'){w=60;h=54;}
-  var inner='';
-  if(fig.shape==='circle') inner=svgCircle(fig.color);
-  else if(fig.shape==='square') inner=svgSquare(fig.color);
-  else if(fig.shape==='rectangle') inner=svgRect(fig.color,fig.rot);
-  else if(fig.shape==='triangle') inner=svgTriangle(fig.color,fig.rot);
-  placed.innerHTML='<div style="width:'+w+'px;height:'+h+'px;display:flex;align-items:center;justify-content:center">'+inner+'</div>';
-  slotEl.appendChild(placed);
-  var chk=createElement('span','placed-check','✅');
-  slotEl.appendChild(chk);
-}
-
-/* ──────── CHECK COMPLETE ──────── */
-function checkComplete(){
-  if(G.correct<G.total) return;
-  setTimeout(function(){
-    sndWhistle();
-    animateTrain();
-    setTimeout(function(){
-      if(G.level<4) showLvlDone();
-      else showWin();
-    },2400);
-  },300);
-}
-
-function animateTrain(){
-  var loco=document.getElementById('trainLoco');
-  if(!loco) return;
-  loco.style.transition='transform 2s ease-in-out';
-  loco.style.transform='translateX(12px) rotate(-1deg)';
-}
-
-function showLvlDone(){
-  var msgs=['¡Nivel 1 completado!','¡Nivel 2 completado!','¡Nivel 3 completado!'];
-  document.getElementById('lvlMsg').textContent=msgs[G.level-1]+' ¡Excelente trabajo! 🎊';
-  var starsMap=['⭐','⭐⭐','⭐⭐⭐'];
-  document.getElementById('modalStars').textContent=starsMap[G.level-1];
-  makeConfetti('modalConfetti');
-  sndLevelUp();
-  showScreen('screen-lvl');
-}
-
-function showWin(){
-  makeFireworks();
-  sndWhistle();
-  setTimeout(sndLevelUp,700);
-  showScreen('screen-win');
-}
-
-/* ──────── CONFETTI / FW ──────── */
-function makeConfetti(cid){
-  var c=document.getElementById(cid); if(!c) return;
-  c.innerHTML='';
-  var cols=['#FF4757','#FFD700','#2ED573','#1E90FF','#A55EEA','#FF6B81','#FFA502'];
-  for(var i=0;i<45;i++){
-    var p=document.createElement('div');
-    p.className='confetti-bit';
-    p.style.cssText='background:'+cols[i%cols.length]+';left:'+(Math.random()*100)+'%;'
-      +'animation-duration:'+(1.2+Math.random()*1.4)+'s;animation-delay:'+(Math.random()*.7)+'s;'
-      +'border-radius:'+(Math.random()>.5?'50%':'2px')+';'
-      +'width:'+(6+Math.random()*7)+'px;height:'+(6+Math.random()*7)+'px;';
-    c.appendChild(p);
-  }
-}
-var _fwInt=null;
-function makeFireworks(){
-  stopFireworks();
-  var bg=document.getElementById('fwBg'); if(!bg) return;
-  var emojis=['🎆','🎇','✨','🌟','💫','🎉','🎊'];
-  var emit=function(){
-    bg.innerHTML='';
-    for(var i=0;i<12;i++){
-      (function(d){setTimeout(function(){
-        var fw=document.createElement('div');
-        fw.className='fw';
-        fw.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-        fw.style.left=(8+Math.random()*84)+'%';
-        fw.style.top=(5+Math.random()*65)+'%';
-        fw.style.animationDuration=(1+Math.random()*.8)+'s';
-        bg.appendChild(fw);
-        setTimeout(function(){fw.remove();},2200);
-      },d);})(i*220);
-    }
-  };
-  emit(); _fwInt=setInterval(emit,4000);
-}
-function stopFireworks(){if(_fwInt){clearInterval(_fwInt);_fwInt=null;}}
-
-function showToast(msg){
-  var t=document.getElementById('toast'); if(!t) return;
-  t.innerHTML=msg;
-  t.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t=setTimeout(function(){t.classList.remove('show');},2800);
-}
-
-/* ──────── DRAG ENGINE ──────── */
-var DragEngine={
-  active:null,
-  init:function(){
-    document.addEventListener('mousemove',function(e){DragEngine._move(e.clientX,e.clientY);});
-    document.addEventListener('touchmove',function(e){
-      if(DragEngine.active) e.preventDefault();
-      var t=e.touches[0]; DragEngine._move(t.clientX,t.clientY);
-    },{passive:false});
-    document.addEventListener('mouseup',function(e){DragEngine._end(e.clientX,e.clientY);});
-    document.addEventListener('touchend',function(e){
-      var t=e.changedTouches[0]; DragEngine._end(t.clientX,t.clientY);
-    });
-  },
-  attach:function(wrapEl,figId){
-    var start=function(cx,cy){
-      var fig=G.figs[figId]; if(!fig||fig.used) return;
-      var shapeDiv=wrapEl.querySelector('[id^="shape_"]');
-      if(!shapeDiv) return;
-      var rect=shapeDiv.getBoundingClientRect();
-      var ghost=document.getElementById('ghost');
-      ghost.innerHTML=shapeDiv.innerHTML;
-      ghost.style.width=rect.width+'px';
-      ghost.style.height=rect.height+'px';
-      ghost.style.display='block';
-      wrapEl.style.opacity='.25';
-      DragEngine.active={figId:figId,wrapEl:wrapEl,ghost:ghost,ox:cx-rect.left,oy:cy-rect.top};
-      DragEngine._posGhost(cx,cy);
+  <!-- ══════ WIN ══════ -->
+  <div id="screen-win" class="screen overlay">
+    <div class="firework-bg" id="fwBg"></div>
+    <div class="modal modal-big">
+      <div class="big-trophy">🏆</div>
+      <h2 class="modal-h rainbow-text">¡FELICITACIONES!</h2>
+      <p class="modal-p big-p">¡Construiste el tren completo!</p>
+      <p class="modal-p">¡El GeoTren ya puede viajar por el mundo!</p>
+      <div class="train-ride-box" aria-hidden="true">
+        <div class="train-ride">🚂🚃🚃💨</div>
+      </div>
+      <p style="font-size:.85rem;color:#e84e5e;font-weight:900">✨ Carol Güiza &amp; Angy Pineda ✨</p>
+      <button class="pbtn pbtn-big" onclick="goMenu()">🏠 Jugar de Nuevo</button>
+    </div>
+  </div>
+
+  <!-- Ghost + Toast -->
+  <div id="ghost" class="ghost" aria-hidden="true"></div>
+  <div id="toast" class="toast" role="alert"></div>
+
+  <script>
+    'use strict';
+    /* ──────── AUDIO ──────── */
+    var AudioCtx = null, soundOn = true;
+    function getCtx() { if (!AudioCtx) AudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (AudioCtx.state === 'suspended') AudioCtx.resume(); return AudioCtx; }
+    function tone(f, t, d, v, delay) { if (!soundOn) return; delay = delay || 0; try { var c = getCtx(), o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.type = t; o.frequency.value = f; var now = c.currentTime + delay; g.gain.setValueAtTime(v, now); g.gain.exponentialRampToValueAtTime(.001, now + d); o.start(now); o.stop(now + d + .05); } catch (e) { } }
+    function sndSuccess() { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 'sine', .3, .22, i * .09) }); }
+    function sndError() { tone(220, 'sawtooth', .25, .18, 0); tone(180, 'sawtooth', .2, .12, .14); }
+    function sndLevelUp() { [523, 659, 784, 1047, 1319].forEach(function (f, i) { tone(f, 'sine', .38, .26, i * .1) }); }
+    function sndWhistle() { [900, 1100, 900, 700, 1100, 900].forEach(function (f, i) { tone(f, 'sine', .22, .3, i * .18) }); }
+    function sndRotate() { tone(660, 'sine', .1, .14, 0); }
+
+    /* ──────── COLORS / NAMES ──────── */
+    var SHAPE_COLORS = { circle: '#e84e5e', square: '#1E90FF', rectangle: '#FFA502', triangle: '#FECA57' };
+    var SHAPE_NAMES = { circle: 'Círculo', square: 'Cuadrado', rectangle: 'Rectángulo', triangle: 'Triángulo' };
+
+    /* ══════════════════════════════════════
+       LEVEL DEFINITIONS
+       Each slot: { id, shape, label }
+       Levels 1-2: no rotation needed
+       Level 3: rotation required
+       Level 4: free (same as 3 structure)
+    ══════════════════════════════════════ */
+    var LEVELS = {
+      // LEVEL 1: Locomotora (chimenea, ventana, cuerpo, 2 ruedas) + 1 vagón (techo triángulo, cuerpo rect, 2 ruedas)
+      1: {
+        slots: [
+          { id: 'loco-chimney', shape: 'rectangle', label: 'Chimenea' },
+          { id: 'loco-win', shape: 'square', label: 'Ventana' },
+          { id: 'loco-body', shape: 'rectangle', label: 'Cuerpo' },
+          { id: 'loco-whl1', shape: 'circle', label: 'Rueda Izq' },
+          { id: 'loco-whl2', shape: 'circle', label: 'Rueda Der' },
+          { id: 'wag-roof', shape: 'triangle', label: 'Techo V' },
+          { id: 'wag-body', shape: 'rectangle', label: 'Cuerpo V' },
+          { id: 'wag-whl1', shape: 'circle', label: 'Rueda Izq' },
+          { id: 'wag-whl2', shape: 'circle', label: 'Rueda Der' },
+        ],
+        // Guided steps for level 2
+        steps: null
+      },
+      // LEVEL 2: Same shape count as level 1 but GUIDED
+      2: {
+        slots: [
+          { id: 'loco-chimney', shape: 'rectangle', label: 'Chimenea' },
+          { id: 'loco-win', shape: 'square', label: 'Ventana' },
+          { id: 'loco-body', shape: 'rectangle', label: 'Cuerpo' },
+          { id: 'loco-whl1', shape: 'circle', label: 'Rueda Izq' },
+          { id: 'loco-whl2', shape: 'circle', label: 'Rueda Der' },
+          { id: 'wag-roof', shape: 'triangle', label: 'Techo V' },
+          { id: 'wag-body', shape: 'rectangle', label: 'Cuerpo V' },
+          { id: 'wag-whl1', shape: 'circle', label: 'Rueda Izq' },
+          { id: 'wag-whl2', shape: 'circle', label: 'Rueda Der' },
+        ],
+        steps: [
+          { html: '🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>IZQUIERDA</b> <span class="arrow">←</span> de la locomotora', shape: 'circle', slot: 'loco-whl1' },
+          { html: '🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>DERECHA</b> <span class="arrow">→</span> de la locomotora', shape: 'circle', slot: 'loco-whl2' },
+          { html: '🟦 Coloca el <b>CUADRADO</b> en la <b>VENTANA</b> de la cabina', shape: 'square', slot: 'loco-win' },
+          { html: '🟧 Coloca el <b>RECTÁNGULO</b> en el <b>CUERPO</b> de la locomotora', shape: 'rectangle', slot: 'loco-body' },
+          { html: '🟧 Coloca el <b>RECTÁNGULO</b> como <b>CHIMENEA</b> (arriba ↑)', shape: 'rectangle', slot: 'loco-chimney' },
+          { html: '🔺 Coloca el <b>TRIÁNGULO</b> como <b>TECHO</b> del vagón (arriba ↑)', shape: 'triangle', slot: 'wag-roof' },
+          { html: '🟧 Coloca el <b>RECTÁNGULO</b> en el <b>CUERPO</b> del vagón', shape: 'rectangle', slot: 'wag-body' },
+          { html: '🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>IZQUIERDA</b> <span class="arrow">←</span> del vagón', shape: 'circle', slot: 'wag-whl1' },
+          { html: '🔴 Coloca el <b>CÍRCULO</b> en la rueda <b>DERECHA</b> <span class="arrow">→</span> del vagón', shape: 'circle', slot: 'wag-whl2' },
+        ]
+      },
+      // LEVEL 3: Complex loco (nose-triangle, 2 chimneys, window, roof-triangle, body) + 2 wagons. Rotation required.
+      3: {
+        slots: [
+          { id: 'loco-nose', shape: 'triangle', label: 'Corta-Hielo' },
+          { id: 'loco-chi1', shape: 'rectangle', label: 'Chimenea 1' },
+          { id: 'loco-chi2', shape: 'rectangle', label: 'Chimenea 2' },
+          { id: 'loco-win', shape: 'square', label: 'Ventana' },
+          { id: 'loco-roof', shape: 'triangle', label: 'Techo Cabina' },
+          { id: 'loco-body', shape: 'rectangle', label: 'Cuerpo' },
+          { id: 'loco-whl1', shape: 'circle', label: 'Rueda Izq' },
+          { id: 'loco-whl2', shape: 'circle', label: 'Rueda Der' },
+          { id: 'wag1-roof', shape: 'triangle', label: 'Techo V1' },
+          { id: 'wag1-body', shape: 'rectangle', label: 'Cuerpo V1' },
+          { id: 'wag1-whl1', shape: 'circle', label: 'Rueda V1 Izq' },
+          { id: 'wag1-whl2', shape: 'circle', label: 'Rueda V1 Der' },
+          { id: 'wag2-roof', shape: 'triangle', label: 'Techo V2' },
+          { id: 'wag2-body', shape: 'rectangle', label: 'Cuerpo V2' },
+          { id: 'wag2-whl1', shape: 'circle', label: 'Rueda V2 Izq' },
+          { id: 'wag2-whl2', shape: 'circle', label: 'Rueda V2 Der' },
+        ],
+        steps: null
+      }
     };
-    wrapEl.addEventListener('mousedown',function(e){e.preventDefault();start(e.clientX,e.clientY);});
-    wrapEl.addEventListener('touchstart',function(e){e.preventDefault();start(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
-  },
-  _move:function(cx,cy){
-    if(!this.active) return;
-    this._posGhost(cx,cy);
-    document.querySelectorAll('.slot:not(.filled)').forEach(function(s){s.classList.remove('over');});
-    var s=this._slotAt(cx,cy); if(s) s.classList.add('over');
-  },
-  _end:function(cx,cy){
-    if(!this.active) return;
-    var figId=this.active.figId,wrapEl=this.active.wrapEl,ghost=this.active.ghost;
-    document.querySelectorAll('.slot').forEach(function(s){s.classList.remove('over');});
-    ghost.style.display='none';
-    wrapEl.style.opacity='1';
-    var slotEl=this._slotAt(cx,cy);
-    if(slotEl&&!slotEl.classList.contains('filled')) attemptDrop(figId,slotEl.dataset.slotId);
-    this.active=null;
-  },
-  _posGhost:function(cx,cy){
-    if(!this.active) return;
-    var g=this.active.ghost;
-    g.style.left=(cx-this.active.ox)+'px';
-    g.style.top=(cy-this.active.oy)+'px';
-  },
-  _slotAt:function(cx,cy){
-    var slots=document.querySelectorAll('.slot:not(.filled)');
-    for(var i=0;i<slots.length;i++){
-      var r=slots[i].getBoundingClientRect();
-      if(cx>=r.left&&cx<=r.right&&cy>=r.top&&cy<=r.bottom) return slots[i];
+
+    // Valid rotations per slot for level 3
+    // Triangles are orientation-sensitive and must match the slot direction.
+    var VALID_ROTS = {
+      // Rectangles: only horizontal placement is valid
+      'loco-chi1': [0, 180],
+      'loco-chi2': [0, 180],
+      'loco-body': [0, 180],
+      'wag1-body': [0, 180],
+      'wag2-body': [0, 180],
+      'wag-body': [0, 180],
+      // Triangles: nose points left, roofs point up
+      'loco-nose': [270],
+      'loco-roof': [0],
+      'wag1-roof': [0],
+      'wag2-roof': [0],
+      'wag-roof': [0],
+      // Default: accept all angles
+      'default': [0, 90, 180, 270]
+    };
+
+    /* ──────── STATE ──────── */
+    var G = { level: 1, step: 0, correct: 0, total: 0, slots: {}, figs: {} };
+
+    /* ──────── START / NAV ──────── */
+    function startLevel(n) {
+      G.level = n; G.step = 0; G.correct = 0;
+      var lvlDef = LEVELS[n];
+      G.total = lvlDef.slots.length;
+      G.slots = {};
+      lvlDef.slots.forEach(function (s) { G.slots[s.id] = { shape: s.shape, filled: false }; });
+      document.getElementById('lvlTag').textContent =
+        n === 1 ? 'Nivel 1 – Reconocimiento' :
+          n === 2 ? 'Nivel 2 – Ubicación' :
+            'Nivel 3 – Rotación';
+      document.getElementById('nextBtn').classList.add('hidden');
+      buildTrainHTML();
+      buildBulbs();
+      buildBank();
+      setInstruction();
+      showScreen('screen-game');
     }
-    return null;
-  }
-};
+    function resetLevel() { startLevel(G.level); }
+    function nextLevel() { if (G.level < 3) startLevel(G.level + 1); else showWin(); }
+    function goMenu() { showScreen('screen-menu'); stopFireworks(); }
+    function toggleSound() {
+      soundOn = !soundOn;
+      var txt = soundOn ? '🔊 Sonido: ON' : '🔇 Sonido: OFF';
+      var mb = document.getElementById('menuSoundBtn');
+      var gb = document.getElementById('gameSoundBtn');
+      if (mb) { mb.textContent = txt; mb.classList.toggle('off', !soundOn); }
+      if (gb) gb.textContent = soundOn ? '🔊' : '🔇';
+    }
 
-/* ──────── UTILITIES ──────── */
-function createElement(tag,cls,txt){
-  var d=document.createElement(tag);
-  if(cls) d.className=cls;
-  if(txt!==undefined) d.textContent=txt;
-  return d;
-}
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(function(s){
-    s.classList.toggle('active',s.id===id);
-  });
-  if(id!=='screen-win') stopFireworks();
-  // Scroll to top when switching screens
-  window.scrollTo(0,0);
-}
-function shuffle(arr){
-  var a=arr.slice();
-  for(var i=a.length-1;i>0;i--){
-    var j=Math.floor(Math.random()*(i+1));
-    var tmp=a[i];a[i]=a[j];a[j]=tmp;
-  }
-  return a;
-}
+    /* ════════════════════════════════════
+       SVG SHAPE GENERATORS
+       These return SVG strings for figures
+    ════════════════════════════════════ */
+    function svgCircle(color) {
+      return '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">'
+        + '<defs><radialGradient id="cg" cx="38%" cy="32%"><stop offset="0%" stop-color="#fff" stop-opacity=".6"/><stop offset="100%" stop-color="' + color + '"/></radialGradient></defs>'
+        + '<circle cx="30" cy="30" r="26" fill="url(#cg)" stroke="rgba(0,0,0,.4)" stroke-width="3"/>'
+        + '<circle cx="30" cy="30" r="6" fill="rgba(0,0,0,.25)"/>'
+        + '<line x1="30" y1="4" x2="30" y2="56" stroke="rgba(0,0,0,.18)" stroke-width="2"/>'
+        + '<line x1="4" y1="30" x2="56" y2="30" stroke="rgba(0,0,0,.18)" stroke-width="2"/>'
+        + '<circle cx="30" cy="30" r="3" fill="#333"/>'
+        + '</svg>';
+    }
+    function svgSquare(color) {
+      return '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">'
+        + '<defs><linearGradient id="sg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="' + color + '"/><stop offset="100%" stop-color="rgba(0,0,0,.25)" stop-opacity=".3"/></linearGradient></defs>'
+        + '<rect x="4" y="4" width="52" height="52" rx="8" fill="url(#sg)" stroke="rgba(0,0,0,.3)" stroke-width="3"/>'
+        + '<rect x="12" y="12" width="36" height="36" rx="4" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>'
+        + '</svg>';
+    }
+    function svgRect(color, rot) {
+      var w = 100, h = 48;
+      var gid = 'rg' + Math.random().toString(36).slice(2);
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">'
+        + '<defs><linearGradient id="' + gid + '" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="' + color + '"/><stop offset="100%" stop-color="rgba(0,0,0,.2)" stop-opacity=".35"/></linearGradient></defs>'
+        + '<rect x="3" y="3" width="' + (w - 6) + '" height="' + (h - 6) + '" rx="10" fill="url(#' + gid + ')" stroke="rgba(0,0,0,.3)" stroke-width="3"/>'
+        + '<rect x="10" y="8" width="' + (w - 20) + '" height="' + (h - 16) + '" rx="6" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>'
+        + '</svg>';
+    }
+    function svgTriangle(color, rot) {
+      var gid = 'tg' + Math.random().toString(36).slice(2);
+      return '<svg viewBox="0 0 60 54" xmlns="http://www.w3.org/2000/svg">'
+        + '<defs><linearGradient id="' + gid + '" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="' + color + '"/><stop offset="100%" stop-color="rgba(0,0,0,.2)" stop-opacity=".3"/></linearGradient></defs>'
+        + '<polygon points="30,4 56,50 4,50" fill="url(#' + gid + ')" stroke="rgba(0,0,0,.3)" stroke-width="2.5" stroke-linejoin="round"/>'
+        + '</svg>';
+    }
 
-/* ──────── INIT ──────── */
-document.addEventListener('DOMContentLoaded',function(){
-  DragEngine.init();
-  showScreen('screen-menu');
-  // Expose globals
-  window.startLevel=startLevel;
-  window.resetLevel=resetLevel;
-  window.nextLevel=nextLevel;
-  window.goMenu=goMenu;
-  window.toggleSound=toggleSound;
-  console.log('🚂 GeoTren v2 listo! — Carol Güiza & Angy Pineda');
-});
-</script>
+    /* Make slot hint SVG */
+    function hintSVG(shape) {
+      var c = 'rgba(0,0,0,.3)';
+      if (shape === 'circle') return '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="6,4"/></svg>';
+      if (shape === 'square') return '<svg viewBox="0 0 60 60"><rect x="6" y="6" width="48" height="48" rx="6" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="6,4"/></svg>';
+      if (shape === 'rectangle') return '<svg viewBox="0 0 100 48"><rect x="4" y="4" width="92" height="40" rx="8" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="6,4"/></svg>';
+      if (shape === 'triangle') return '<svg viewBox="0 0 60 54"><polygon points="30,4 56,50 4,50" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="6,4"/></svg>';
+      return '';
+    }
+
+    /* ════════════════════════════════════
+       MAKE SLOT ELEMENT
+    ════════════════════════════════════ */
+    function makeSlot(slotId) {
+      var lvlDef = LEVELS[G.level];
+      var def = lvlDef.slots.filter(function (s) { return s.id === slotId; })[0];
+      if (!def) return document.createElement('div');
+      var d = document.createElement('div');
+      d.className = 'slot';
+      d.dataset.slotId = slotId;
+      d.dataset.shape = def.shape;
+      // hint
+      var hint = document.createElement('div');
+      hint.className = 'slot-hint';
+      hint.innerHTML = hintSVG(def.shape);
+      d.appendChild(hint);
+      // label
+      var lbl = document.createElement('span');
+      lbl.className = 'slot-lbl';
+      lbl.textContent = def.label;
+      d.appendChild(lbl);
+      return d;
+    }
+
+    /* ════════════════════════════════════
+       BUILD TRAIN HTML — one function per level
+    ════════════════════════════════════ */
+    function buildTrainHTML() {
+      var wrap = document.getElementById('trainWrap');
+      wrap.innerHTML = '';
+      if (G.level === 1) buildTrain1(wrap);
+      else if (G.level === 2) buildTrain2(wrap);
+      else buildTrain34(wrap);
+    }
+
+    /* Helper: connector between cars */
+    function connector() {
+      var c = document.createElement('div');
+      c.className = 'connector';
+      c.innerHTML = '<div class="conn-dot"></div><div class="conn-bar"></div><div class="conn-dot"></div>';
+      return c;
+    }
+
+    /* ── LEVEL 1: Simple loco (red/orange) + 1 wagon ── */
+    function buildTrain1(wrap) {
+      // Colors: warm red loco
+      var locoColor = '#e84e5e';
+      var wagColor = '#1E90FF';
+
+      // Loco car
+      var loco = document.createElement('div');
+      loco.id = 'trainLoco';
+      loco.className = 'train-car';
+      loco.style.cssText = 'background:' + locoColor + ';border-radius:12px 24px 12px 12px;padding:6px 10px 6px 10px;min-width:110px;position:relative;border:3px solid rgba(0,0,0,.2)';
+
+      // Chimney area
+      var chiBox = document.createElement('div');
+      chiBox.style.cssText = 'display:flex;justify-content:flex-end;padding-right:8px;margin-bottom:2px';
+      var chiTop = document.createElement('div');
+      chiTop.style.cssText = 'width:20px;height:8px;background:#8B3A3A;border-radius:4px 4px 0 0;margin-right:2px';
+      chiBox.appendChild(chiTop);
+      chiBox.appendChild(makeSlot('loco-chimney'));
+      loco.appendChild(chiBox);
+
+      // Face + window
+      var topRow = document.createElement('div');
+      topRow.style.cssText = 'display:flex;align-items:center;gap:6px;justify-content:space-between';
+      var face = document.createElement('div');
+      face.innerHTML = '<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#FFDDB6" stroke="#a67c52" stroke-width="1.5"/><circle cx="14" cy="17" r="2.5" fill="#333"/><circle cx="26" cy="17" r="2.5" fill="#333"/><path d="M14 26 Q20 30 26 26" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+      topRow.appendChild(face);
+      topRow.appendChild(makeSlot('loco-win'));
+      loco.appendChild(topRow);
+
+      // Body
+      var bodyRow = document.createElement('div');
+      bodyRow.style.cssText = 'margin:4px 0;display:flex;justify-content:center';
+      bodyRow.appendChild(makeSlot('loco-body'));
+      loco.appendChild(bodyRow);
+
+      // Base bar
+      var base = document.createElement('div');
+      base.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      loco.appendChild(base);
+
+      // Wheels
+      var wheels = document.createElement('div');
+      wheels.className = 'wheels-row';
+      wheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wheels.appendChild(makeSlot('loco-whl1'));
+      var axle = document.createElement('div'); axle.className = 'axle'; axle.style.width = '20px';
+      wheels.appendChild(axle);
+      wheels.appendChild(makeSlot('loco-whl2'));
+      loco.appendChild(wheels);
+      wrap.appendChild(loco);
+      wrap.appendChild(connector());
+
+      // Wagon
+      var wag = document.createElement('div');
+      wag.id = 'trainWagon';
+      wag.className = 'train-car';
+      wag.style.cssText = 'background:' + wagColor + ';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
+
+      var roofRow = document.createElement('div');
+      roofRow.style.cssText = 'display:flex;justify-content:center;margin-bottom:2px';
+      roofRow.appendChild(makeSlot('wag-roof'));
+      wag.appendChild(roofRow);
+
+      var wbody = document.createElement('div');
+      wbody.style.cssText = 'display:flex;justify-content:center;margin:4px 0';
+      wbody.appendChild(makeSlot('wag-body'));
+      wag.appendChild(wbody);
+
+      var wbase = document.createElement('div');
+      wbase.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      wag.appendChild(wbase);
+
+      var wwheels = document.createElement('div');
+      wwheels.className = 'wheels-row';
+      wwheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wwheels.appendChild(makeSlot('wag-whl1'));
+      var axle2 = document.createElement('div'); axle2.className = 'axle'; axle2.style.width = '20px';
+      wwheels.appendChild(axle2);
+      wwheels.appendChild(makeSlot('wag-whl2'));
+      wag.appendChild(wwheels);
+      wrap.appendChild(wag);
+    }
+
+    /* ── LEVEL 2: Green loco + 1 wagon (guided) ── */
+    function buildTrain2(wrap) {
+      var locoColor = '#2ed573';
+      var wagColor = '#ffa502';
+
+      var loco = document.createElement('div');
+      loco.id = 'trainLoco';
+      loco.className = 'train-car';
+      loco.style.cssText = 'background:' + locoColor + ';border-radius:12px 24px 12px 12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
+
+      var chiBox = document.createElement('div');
+      chiBox.style.cssText = 'display:flex;justify-content:flex-end;padding-right:8px;margin-bottom:2px';
+      var chiTop = document.createElement('div');
+      chiTop.style.cssText = 'width:20px;height:8px;background:#1a7a45;border-radius:4px 4px 0 0;margin-right:2px';
+      chiBox.appendChild(chiTop);
+      chiBox.appendChild(makeSlot('loco-chimney'));
+      loco.appendChild(chiBox);
+
+      var topRow = document.createElement('div');
+      topRow.style.cssText = 'display:flex;align-items:center;gap:6px;justify-content:space-between';
+      var face = document.createElement('div');
+      face.innerHTML = '<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#FFDDB6" stroke="#a67c52" stroke-width="1.5"/><circle cx="14" cy="17" r="2.5" fill="#333"/><circle cx="26" cy="17" r="2.5" fill="#333"/><path d="M14 26 Q20 30 26 26" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+      topRow.appendChild(face);
+      topRow.appendChild(makeSlot('loco-win'));
+      loco.appendChild(topRow);
+
+      var bodyRow = document.createElement('div');
+      bodyRow.style.cssText = 'margin:4px 0;display:flex;justify-content:center';
+      bodyRow.appendChild(makeSlot('loco-body'));
+      loco.appendChild(bodyRow);
+
+      var base = document.createElement('div');
+      base.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      loco.appendChild(base);
+
+      var wheels = document.createElement('div');
+      wheels.className = 'wheels-row';
+      wheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wheels.appendChild(makeSlot('loco-whl1'));
+      var axle = document.createElement('div'); axle.className = 'axle'; axle.style.width = '20px';
+      wheels.appendChild(axle);
+      wheels.appendChild(makeSlot('loco-whl2'));
+      loco.appendChild(wheels);
+      wrap.appendChild(loco);
+      wrap.appendChild(connector());
+
+      var wag = document.createElement('div');
+      wag.id = 'trainWagon';
+      wag.className = 'train-car';
+      wag.style.cssText = 'background:' + wagColor + ';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
+
+      var roofRow = document.createElement('div');
+      roofRow.style.cssText = 'display:flex;justify-content:center;margin-bottom:2px';
+      roofRow.appendChild(makeSlot('wag-roof'));
+      wag.appendChild(roofRow);
+
+      var wbody = document.createElement('div');
+      wbody.style.cssText = 'display:flex;justify-content:center;margin:4px 0';
+      wbody.appendChild(makeSlot('wag-body'));
+      wag.appendChild(wbody);
+
+      var wbase = document.createElement('div');
+      wbase.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      wag.appendChild(wbase);
+
+      var wwheels = document.createElement('div');
+      wwheels.className = 'wheels-row';
+      wwheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wwheels.appendChild(makeSlot('wag-whl1'));
+      var axle2 = document.createElement('div'); axle2.className = 'axle'; axle2.style.width = '20px';
+      wwheels.appendChild(axle2);
+      wwheels.appendChild(makeSlot('wag-whl2'));
+      wag.appendChild(wwheels);
+      wrap.appendChild(wag);
+    }
+
+    /* ── LEVELS 3 & 4: Purple/dark loco + 2 wagons ── */
+    function buildTrain34(wrap) {
+      var locoColor = '#6c5ce7';
+      var wag1Color = '#a55eea';
+      var wag2Color = '#fd79a8';
+
+      // LOCO
+      var loco = document.createElement('div');
+      loco.id = 'trainLoco';
+      loco.className = 'train-car';
+      loco.style.cssText = 'background:' + locoColor + ';border-radius:12px 28px 12px 12px;padding:6px 10px;min-width:130px;border:3px solid rgba(0,0,0,.22);position:relative';
+
+      // Nose (corta-hielo) — left side triangle slot
+      var noseRow = document.createElement('div');
+      noseRow.style.cssText = 'display:flex;align-items:center;margin-bottom:3px;gap:4px';
+      var noseLbl = document.createElement('span');
+      noseLbl.style.cssText = 'font-size:.6rem;font-weight:900;color:rgba(255,255,255,.7);writing-mode:horizontal-tb';
+      noseLbl.textContent = '◀';
+      noseRow.appendChild(noseLbl);
+      noseRow.appendChild(makeSlot('loco-nose'));
+      loco.appendChild(noseRow);
+
+      // Two chimneys
+      var chiRow = document.createElement('div');
+      chiRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;margin-bottom:2px';
+      var ct1 = document.createElement('div'); ct1.style.cssText = 'width:14px;height:7px;background:#3a2c8a;border-radius:4px 4px 0 0';
+      var ct2 = document.createElement('div'); ct2.style.cssText = 'width:14px;height:7px;background:#3a2c8a;border-radius:4px 4px 0 0';
+      chiRow.appendChild(ct1); chiRow.appendChild(makeSlot('loco-chi1'));
+      chiRow.appendChild(ct2); chiRow.appendChild(makeSlot('loco-chi2'));
+      loco.appendChild(chiRow);
+
+      // Roof triangle + window
+      var midRow = document.createElement('div');
+      midRow.style.cssText = 'display:flex;align-items:center;gap:6px;justify-content:space-between';
+      midRow.appendChild(makeSlot('loco-roof'));
+      midRow.appendChild(makeSlot('loco-win'));
+      loco.appendChild(midRow);
+
+      // Body
+      var brow = document.createElement('div');
+      brow.style.cssText = 'margin:4px 0;display:flex;justify-content:center';
+      brow.appendChild(makeSlot('loco-body'));
+      loco.appendChild(brow);
+
+      var base = document.createElement('div');
+      base.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      loco.appendChild(base);
+
+      var wheels = document.createElement('div');
+      wheels.className = 'wheels-row';
+      wheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wheels.appendChild(makeSlot('loco-whl1'));
+      var axle = document.createElement('div'); axle.className = 'axle'; axle.style.width = '20px';
+      wheels.appendChild(axle);
+      wheels.appendChild(makeSlot('loco-whl2'));
+      loco.appendChild(wheels);
+      wrap.appendChild(loco);
+      wrap.appendChild(connector());
+
+      // WAG 1
+      wrap.appendChild(buildWagon('trainWagon1', wag1Color, 'wag1-roof', 'wag1-body', 'wag1-whl1', 'wag1-whl2'));
+      wrap.appendChild(connector());
+
+      // WAG 2
+      wrap.appendChild(buildWagon('trainWagon2', wag2Color, 'wag2-roof', 'wag2-body', 'wag2-whl1', 'wag2-whl2'));
+    }
+
+    function buildWagon(id, color, roofId, bodyId, whl1Id, whl2Id) {
+      var wag = document.createElement('div');
+      wag.id = id;
+      wag.className = 'train-car';
+      wag.style.cssText = 'background:' + color + ';border-radius:12px;padding:6px 10px;min-width:110px;border:3px solid rgba(0,0,0,.2)';
+
+      var roofRow = document.createElement('div');
+      roofRow.style.cssText = 'display:flex;justify-content:center;margin-bottom:2px';
+      roofRow.appendChild(makeSlot(roofId));
+      wag.appendChild(roofRow);
+
+      var wbody = document.createElement('div');
+      wbody.style.cssText = 'display:flex;justify-content:center;margin:4px 0';
+      wbody.appendChild(makeSlot(bodyId));
+      wag.appendChild(wbody);
+
+      var wbase = document.createElement('div');
+      wbase.style.cssText = 'height:10px;background:rgba(0,0,0,.25);border-radius:0 0 8px 8px;margin:2px -4px 0';
+      wag.appendChild(wbase);
+
+      var wwheels = document.createElement('div');
+      wwheels.className = 'wheels-row';
+      wwheels.style.cssText = 'justify-content:center;gap:12px;padding:4px 0';
+      wwheels.appendChild(makeSlot(whl1Id));
+      var axle = document.createElement('div'); axle.className = 'axle'; axle.style.width = '20px';
+      wwheels.appendChild(axle);
+      wwheels.appendChild(makeSlot(whl2Id));
+      wag.appendChild(wwheels);
+      return wag;
+    }
+
+    /* ════════════════════════════════════
+       BANK OF FIGURES
+    ════════════════════════════════════ */
+    function buildBank() {
+      var row = document.getElementById('bankRow');
+      row.innerHTML = '';
+      G.figs = {};
+      var list = makeFigList();
+      list = shuffle(list);
+      list.forEach(function (f, i) {
+        var id = 'fig' + i;
+        var color = SHAPE_COLORS[f.shape];
+        G.figs[id] = { shape: f.shape, color: color, rot: f.rot, used: false, el: null };
+        var wrap = document.createElement('div');
+        wrap.className = 'fig-wrap'; wrap.id = 'fw_' + id;
+        var figEl = document.createElement('div');
+        figEl.className = 'fig'; figEl.dataset.figId = id;
+        G.figs[id].el = figEl;
+        figEl.innerHTML = makeFigHTML(f.shape, color, f.rot, id);
+        // rotate button (level 3 only, for rectangles and triangles)
+        var canRot = (f.shape === 'rectangle' || f.shape === 'triangle');
+        if (G.level === 3 && canRot) {
+          var rb = document.createElement('button');
+          rb.className = 'rot-btn'; rb.title = 'Rotar'; rb.setAttribute('aria-label', 'Rotar figura'); rb.textContent = '🔄';
+          (function (fid) {
+            rb.addEventListener('click', function (e) { e.stopPropagation(); rotateFig(fid); });
+            rb.addEventListener('touchend', function (e) { e.stopPropagation(); e.preventDefault(); rotateFig(fid); });
+          })(id);
+          figEl.appendChild(rb);
+        }
+        wrap.appendChild(figEl);
+        wrap.appendChild(createElement('span', 'fig-lbl', SHAPE_NAMES[f.shape]));
+        if (G.level === 3 && canRot) {
+          var degEl = createElement('span', 'rot-deg', f.rot + '°');
+          degEl.id = 'deg_' + id;
+          wrap.appendChild(degEl);
+        }
+        DragEngine.attach(wrap, id);
+        row.appendChild(wrap);
+      });
+    }
+
+    function makeFigHTML(shape, color, rot, id) {
+      var w = 60, h = 60;
+      if (shape === 'rectangle') { w = 90; h = 44; }
+      if (shape === 'triangle') { w = 60; h = 54; }
+      var inner = '';
+      if (shape === 'circle') inner = svgCircle(color);
+      else if (shape === 'square') inner = svgSquare(color);
+      else if (shape === 'rectangle') inner = svgRect(color, rot);
+      else if (shape === 'triangle') inner = svgTriangle(color, rot);
+      return '<div id="shape_' + id + '" style="width:' + w + 'px;height:' + h + 'px;display:flex;align-items:center;justify-content:center;transform:rotate(' + rot + 'deg);transform-origin:50% 50%">' + inner + '</div>';
+    }
+
+    function makeFigList() {
+      var lvlDef = LEVELS[G.level];
+      if (G.level === 1) {
+        // all pieces needed + 2 extras (one extra circle, one extra triangle as distractors)
+        var out = lvlDef.slots.map(function (s) { return { shape: s.shape, rot: 0 }; });
+        out.push({ shape: 'circle', rot: 0 });
+        out.push({ shape: 'triangle', rot: 0 });
+        return out;
+      }
+      if (G.level === 2) {
+        // Guided: show only current step's shape + 2 distractors
+        var step = lvlDef.steps[G.step];
+        var dist = ['circle', 'square', 'rectangle', 'triangle'].filter(function (sh) { return sh !== step.shape; }).slice(0, 2);
+        var out2 = [{ shape: step.shape, rot: 0 }];
+        dist.forEach(function (sh) { out2.push({ shape: sh, rot: 0 }); });
+        return out2;
+      }
+      if (G.level === 3) {
+        // All needed pieces; rectangles and triangles start with random rotation
+        return lvlDef.slots.map(function (s) {
+          var r = 0;
+          if (s.shape === 'rectangle' || s.shape === 'triangle') r = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
+          return { shape: s.shape, rot: r };
+        });
+      }
+      return [];
+    }
+
+    /* ──────── INSTRUCTION ──────── */
+    function setInstruction() {
+      var box = document.getElementById('instr');
+      if (G.level === 1) {
+        box.innerHTML = '🚂 <b>Arrastra</b> cada figura al espacio de la <b>misma forma</b>';
+      } else if (G.level === 2) {
+        var step = LEVELS[2].steps[G.step];
+        box.innerHTML = step.html + '<span class="badge">Paso ' + (G.step + 1) + ' / ' + LEVELS[2].steps.length + '</span>';
+        document.querySelectorAll('.slot').forEach(function (s) { s.classList.remove('target'); });
+        var tgt = document.querySelector('.slot[data-slot-id="' + step.slot + '"]');
+        if (tgt) tgt.classList.add('target');
+      } else if (G.level === 3) {
+        box.innerHTML = '🔄 Presiona <b>🔄</b> para rotar las figuras y colócalas correctamente';
+      } else {
+        box.innerHTML = '🛠️ <b>Modo Libre</b> — construye el tren por ti mismo con las piezas disponibles';
+      }
+    }
+
+    /* ──────── BULBS ──────── */
+    function buildBulbs() {
+      var row = document.getElementById('bulbs');
+      row.innerHTML = '';
+      var n = Math.min(G.total, 12);
+      for (var i = 0; i < n; i++) {
+        var b = createElement('span', 'bulb', '💡');
+        b.id = 'b' + i; row.appendChild(b);
+      }
+    }
+    function lightBulb(i) {
+      var b = document.getElementById('b' + i);
+      if (!b) return;
+      b.style.animation = 'none'; b.offsetHeight;
+      b.classList.add('on');
+    }
+
+    /* ──────── ROTATE ──────── */
+    function rotateFig(figId) {
+      var fig = G.figs[figId];
+      if (!fig || fig.used) return;
+      if (fig.shape === 'circle' || fig.shape === 'square') return;
+      fig.rot = (fig.rot + 90) % 360;
+      sndRotate();
+      // Re-render the shape inside
+      var shapeDiv = document.getElementById('shape_' + figId);
+      if (shapeDiv) {
+        shapeDiv.style.transform = 'rotate(' + fig.rot + 'deg)';
+        if (fig.shape === 'triangle') shapeDiv.innerHTML = svgTriangle(fig.color, fig.rot);
+        else if (fig.shape === 'rectangle') shapeDiv.innerHTML = svgRect(fig.color, fig.rot);
+      }
+      var degEl = document.getElementById('deg_' + figId);
+      if (degEl) degEl.textContent = fig.rot + '°';
+    }
+
+    /* ════════════════════════════════════
+       DROP LOGIC
+    ════════════════════════════════════ */
+    function attemptDrop(figId, slotId) {
+      var fig = G.figs[figId];
+      var slot = G.slots[slotId];
+      if (!fig || !slot || slot.filled || fig.used) return;
+      var slotEl = document.querySelector('.slot[data-slot-id="' + slotId + '"]');
+      if (!slotEl || slotEl.classList.contains('filled')) return;
+
+      var valid = false;
+      var failReason = null;
+      var allowedAngles = null;
+      if (G.level === 1) {
+        valid = (fig.shape === slot.shape);
+      } else if (G.level === 2) {
+        var step = LEVELS[2].steps[G.step];
+        valid = (fig.shape === slot.shape) && (slotId === step.slot);
+      } else {
+        // level 3: both rectangles and triangles must match required orientation
+        var vRots = VALID_ROTS[slotId] || VALID_ROTS['default'];
+        var r = ((fig.rot % 360) + 360) % 360;
+        valid = (fig.shape === slot.shape) && (vRots.indexOf(r) !== -1);
+        if (!valid && fig.shape === slot.shape) {
+          failReason = 'rotation';
+          allowedAngles = vRots;
+        }
+      }
+      if (valid) onCorrect(figId, slotId, slotEl, fig, slot);
+      else onError(figId, slotId, slotEl, fig, slot, failReason, allowedAngles);
+    }
+
+    function onCorrect(figId, slotId, slotEl, fig, slot) {
+      fig.used = true; slot.filled = true; G.correct++;
+      var wrap = document.getElementById('fw_' + figId);
+      if (wrap) wrap.style.opacity = '.2';
+      if (fig.el) fig.el.classList.add('fig-used');
+      fillSlot(slotEl, fig);
+      slotEl.classList.remove('target');
+      lightBulb(G.correct - 1);
+      sndSuccess();
+      slotEl.classList.add('slot-correct-flash');
+      setTimeout(function () { slotEl.classList.remove('slot-correct-flash'); }, 600);
+      if (G.level === 2) {
+        G.step++;
+        if (G.step < LEVELS[2].steps.length) setTimeout(function () { buildBank(); setInstruction(); }, 500);
+      }
+      setTimeout(checkComplete, 350);
+    }
+
+    function onError(figId, slotId, slotEl, fig, slot, failReason, allowedAngles) {
+      sndError();
+      slotEl.classList.add('error');
+      setTimeout(function () { slotEl.classList.remove('error'); }, 500);
+      var msg = '¡Esa figura no encaja ahí! Inténtalo de nuevo 😊';
+      if (G.level === 2) {
+        var step = LEVELS[2].steps[G.step];
+        if (fig.shape !== slot.shape) msg = '¡Necesitas un <b>' + SHAPE_NAMES[step.shape] + '</b>!';
+        else msg = '¡Figura correcta, lugar incorrecto! Fíjate en la instrucción 👀';
+      } else if (G.level === 3 && failReason === 'rotation' && fig.shape === 'rectangle') {
+        msg = '¡Gira el rectángulo! Ángulos válidos: ' + (allowedAngles || []).join(', ') + '° 🔄';
+      } else if (G.level === 3 && failReason === 'rotation' && fig.shape === 'triangle') {
+        msg = '¡Gira el triángulo! Ángulos válidos: ' + (allowedAngles || []).join(', ') + '° 🔄';
+      } else if (fig.shape !== slot.shape) {
+        msg = '¡Forma incorrecta! Esa es un <b>' + SHAPE_NAMES[fig.shape] + '</b>';
+      }
+      showToast(msg);
+    }
+
+    function fillSlot(slotEl, fig) {
+      slotEl.classList.add('filled');
+      slotEl.innerHTML = '';
+      var placed = document.createElement('div');
+      placed.className = 'placed';
+      var w = 60, h = 60;
+      if (fig.shape === 'rectangle') { w = 94; h = 44; }
+      if (fig.shape === 'triangle') { w = 60; h = 54; }
+      var inner = '';
+      if (fig.shape === 'circle') inner = svgCircle(fig.color);
+      else if (fig.shape === 'square') inner = svgSquare(fig.color);
+      else if (fig.shape === 'rectangle') inner = svgRect(fig.color, fig.rot);
+      else if (fig.shape === 'triangle') inner = svgTriangle(fig.color, fig.rot);
+      placed.innerHTML = '<div style="width:' + w + 'px;height:' + h + 'px;display:flex;align-items:center;justify-content:center;transform:rotate(' + fig.rot + 'deg);transform-origin:50% 50%">' + inner + '</div>';
+      slotEl.appendChild(placed);
+      var chk = createElement('span', 'placed-check', '✅');
+      slotEl.appendChild(chk);
+    }
+
+    /* ──────── CHECK COMPLETE ──────── */
+    function checkComplete() {
+      if (G.correct < G.total) return;
+      setTimeout(function () {
+        sndWhistle();
+        animateTrain();
+        setTimeout(function () {
+          if (G.level < 4) showLvlDone();
+          else showWin();
+        }, 2400);
+      }, 300);
+    }
+
+    function animateTrain() {
+      var loco = document.getElementById('trainLoco');
+      if (!loco) return;
+      loco.style.transition = 'transform 2s ease-in-out';
+      loco.style.transform = 'translateX(12px) rotate(-1deg)';
+    }
+
+    function showLvlDone() {
+      var msgs = ['¡Nivel 1 completado!', '¡Nivel 2 completado!', '¡Nivel 3 completado!'];
+      document.getElementById('lvlMsg').textContent = msgs[G.level - 1] + ' ¡Excelente trabajo! 🎊';
+      var starsMap = ['⭐', '⭐⭐', '⭐⭐⭐'];
+      document.getElementById('modalStars').textContent = starsMap[G.level - 1];
+      makeConfetti('modalConfetti');
+      sndLevelUp();
+      showScreen('screen-lvl');
+    }
+
+    function showWin() {
+      makeFireworks();
+      sndWhistle();
+      setTimeout(sndLevelUp, 700);
+      showScreen('screen-win');
+    }
+
+    /* ──────── CONFETTI / FW ──────── */
+    function makeConfetti(cid) {
+      var c = document.getElementById(cid); if (!c) return;
+      c.innerHTML = '';
+      var cols = ['#FF4757', '#FFD700', '#2ED573', '#1E90FF', '#A55EEA', '#FF6B81', '#FFA502'];
+      for (var i = 0; i < 45; i++) {
+        var p = document.createElement('div');
+        p.className = 'confetti-bit';
+        p.style.cssText = 'background:' + cols[i % cols.length] + ';left:' + (Math.random() * 100) + '%;'
+          + 'animation-duration:' + (1.2 + Math.random() * 1.4) + 's;animation-delay:' + (Math.random() * .7) + 's;'
+          + 'border-radius:' + (Math.random() > .5 ? '50%' : '2px') + ';'
+          + 'width:' + (6 + Math.random() * 7) + 'px;height:' + (6 + Math.random() * 7) + 'px;';
+        c.appendChild(p);
+      }
+    }
+    var _fwInt = null;
+    function makeFireworks() {
+      stopFireworks();
+      var bg = document.getElementById('fwBg'); if (!bg) return;
+      var emojis = ['🎆', '🎇', '✨', '🌟', '💫', '🎉', '🎊'];
+      var emit = function () {
+        bg.innerHTML = '';
+        for (var i = 0; i < 12; i++) {
+          (function (d) {
+            setTimeout(function () {
+              var fw = document.createElement('div');
+              fw.className = 'fw';
+              fw.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+              fw.style.left = (8 + Math.random() * 84) + '%';
+              fw.style.top = (5 + Math.random() * 65) + '%';
+              fw.style.animationDuration = (1 + Math.random() * .8) + 's';
+              bg.appendChild(fw);
+              setTimeout(function () { fw.remove(); }, 2200);
+            }, d);
+          })(i * 220);
+        }
+      };
+      emit(); _fwInt = setInterval(emit, 4000);
+    }
+    function stopFireworks() { if (_fwInt) { clearInterval(_fwInt); _fwInt = null; } }
+
+    function showToast(msg) {
+      var t = document.getElementById('toast'); if (!t) return;
+      t.innerHTML = msg;
+      t.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+    }
+
+    /* ──────── DRAG ENGINE ──────── */
+    var DragEngine = {
+      active: null,
+      init: function () {
+        document.addEventListener('mousemove', function (e) { DragEngine._move(e.clientX, e.clientY); });
+        document.addEventListener('touchmove', function (e) {
+          if (DragEngine.active) e.preventDefault();
+          var t = e.touches[0]; DragEngine._move(t.clientX, t.clientY);
+        }, { passive: false });
+        document.addEventListener('mouseup', function (e) { DragEngine._end(e.clientX, e.clientY); });
+        document.addEventListener('touchend', function (e) {
+          var t = e.changedTouches[0]; DragEngine._end(t.clientX, t.clientY);
+        });
+      },
+      attach: function (wrapEl, figId) {
+        var start = function (cx, cy) {
+          var fig = G.figs[figId]; if (!fig || fig.used) return;
+          var shapeDiv = wrapEl.querySelector('[id^="shape_"]');
+          if (!shapeDiv) return;
+          var rect = shapeDiv.getBoundingClientRect();
+          var ghost = document.getElementById('ghost');
+          ghost.innerHTML = shapeDiv.innerHTML;
+          ghost.style.width = rect.width + 'px';
+          ghost.style.height = rect.height + 'px';
+          ghost.style.display = 'block';
+          wrapEl.style.opacity = '.25';
+          DragEngine.active = { figId: figId, wrapEl: wrapEl, ghost: ghost, ox: cx - rect.left, oy: cy - rect.top };
+          DragEngine._posGhost(cx, cy);
+        };
+        wrapEl.addEventListener('mousedown', function (e) { e.preventDefault(); start(e.clientX, e.clientY); });
+        wrapEl.addEventListener('touchstart', function (e) { e.preventDefault(); start(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+      },
+      _move: function (cx, cy) {
+        if (!this.active) return;
+        this._posGhost(cx, cy);
+        document.querySelectorAll('.slot:not(.filled)').forEach(function (s) { s.classList.remove('over'); });
+        var s = this._slotAt(cx, cy); if (s) s.classList.add('over');
+      },
+      _end: function (cx, cy) {
+        if (!this.active) return;
+        var figId = this.active.figId, wrapEl = this.active.wrapEl, ghost = this.active.ghost;
+        document.querySelectorAll('.slot').forEach(function (s) { s.classList.remove('over'); });
+        ghost.style.display = 'none';
+        wrapEl.style.opacity = '1';
+        var slotEl = this._slotAt(cx, cy);
+        if (slotEl && !slotEl.classList.contains('filled')) attemptDrop(figId, slotEl.dataset.slotId);
+        this.active = null;
+      },
+      _posGhost: function (cx, cy) {
+        if (!this.active) return;
+        var g = this.active.ghost;
+        g.style.left = (cx - this.active.ox) + 'px';
+        g.style.top = (cy - this.active.oy) + 'px';
+      },
+      _slotAt: function (cx, cy) {
+        var slots = document.querySelectorAll('.slot:not(.filled)');
+        for (var i = 0; i < slots.length; i++) {
+          var r = slots[i].getBoundingClientRect();
+          if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) return slots[i];
+        }
+        return null;
+      }
+    };
+
+    /* ──────── UTILITIES ──────── */
+    function createElement(tag, cls, txt) {
+      var d = document.createElement(tag);
+      if (cls) d.className = cls;
+      if (txt !== undefined) d.textContent = txt;
+      return d;
+    }
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (s) {
+        s.classList.toggle('active', s.id === id);
+      });
+      if (id !== 'screen-win') stopFireworks();
+      // Scroll to top when switching screens
+      window.scrollTo(0, 0);
+    }
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    /* ──────── INIT ──────── */
+    document.addEventListener('DOMContentLoaded', function () {
+      DragEngine.init();
+      showScreen('screen-menu');
+      // Expose globals
+      window.startLevel = startLevel;
+      window.resetLevel = resetLevel;
+      window.nextLevel = nextLevel;
+      window.goMenu = goMenu;
+      window.toggleSound = toggleSound;
+      console.log('🚂 GeoTren v2 listo! — Carol Güiza & Angy Pineda');
+    });
+  </script>
 </body>
+
 </html>
