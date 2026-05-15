@@ -27,7 +27,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  touch-action: none;
+  /* Allow vertical scrolling on mobile while keeping drag handlers working (DragEngine prevents default when dragging) */
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -442,29 +443,7 @@ button:focus-visible {
   filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.36));
 }
 
-.loco-front {
-  position: absolute;
-  left: -16px;
-  bottom: 30px;
-  width: 108px;
-  height: 72px;
-  border-radius: 58px 28px 26px 46px;
-  background: linear-gradient(180deg, #ffd84d 0%, #f3b500 100%);
-  border: 3px solid rgba(0, 0, 0, 0.28);
-  box-shadow: inset 0 8px 0 rgba(255, 255, 255, 0.18);
-}
-
-.loco-front::after {
-  content: "";
-  position: absolute;
-  right: -12px;
-  top: 16px;
-  width: 20px;
-  height: 20px;
-  background: #e84e5e;
-  border: 3px solid rgba(0, 0, 0, 0.22);
-  border-radius: 50%;
-}
+/* loco-front removed — front is omitted per user request */
 
 /* Chimenea */
 .loco-chimney-area {
@@ -528,6 +507,10 @@ button:focus-visible {
   justify-content: center;
   font-size: clamp(1.6rem, 5vw, 2.4rem);
   padding: 0 4px;
+}
+.loco-face svg {
+  width: 2.2rem;
+  height: 2.2rem;
 }
 .loco-wins {
   display: flex;
@@ -1070,6 +1053,21 @@ button:focus-visible {
 /* La figura en sí */
 .fig {
   display: flex;
+
+  @media (max-width: 480px) {
+    .train-wrap {
+      bottom: 46px;
+      width: 98%;
+      padding: 0 6px;
+    }
+    .loco-base {
+      height: 10px;
+    }
+    .wheel-deco {
+      width: 48px;
+      height: 48px;
+    }
+  }
   align-items: center;
   justify-content: center;
   cursor: grab;
@@ -1241,6 +1239,8 @@ button:focus-visible {
   justify-content: center;
   align-items: flex-end;
   min-height: 86px;
+  /* On narrow devices allow horizontal scroll so items are easier to reach */
+  -webkit-overflow-scrolling: touch;
 }
 
 .game-footer {
@@ -1531,6 +1531,40 @@ button:focus-visible {
    RESPONSIVE
    ════════════════════════════════════ */
 @media (max-width: 480px) {
+  /* Make bank horizontally scrollable and touch-friendly on small screens */
+  .bank-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    justify-content: flex-start;
+  }
+  .bank-row::-webkit-scrollbar {
+    height: 8px;
+  }
+  .bank-row::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+  }
+
+  /* Increase touch targets */
+  .icon-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+  .fbtn {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  .rot-btn {
+    width: 34px;
+    height: 34px;
+    top: -8px;
+    right: -8px;
+  }
+  .fig {
+    padding: 6px;
+  }
   .slot[data-shape="circle"] {
     width: 50px;
     height: 50px;

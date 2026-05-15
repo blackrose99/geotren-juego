@@ -267,7 +267,7 @@ function buildTrainHTML_TwoWagons(wrap) {
   var loco = el('div', 'loco');
   loco.id = 'trainLoco';
 
-  loco.appendChild(el('div', 'loco-front'));
+  // loco-front removed per request (SVG front omitted)
 
   var chiArea = el('div', 'loco-chimney-area');
   chiArea.appendChild(el('div', 'chimney-top'));
@@ -276,7 +276,16 @@ function buildTrainHTML_TwoWagons(wrap) {
 
   var locoTop = el('div', 'loco-top');
   locoTop.appendChild(el('div', 'loco-roof-bow'));
-  locoTop.appendChild(el('div', 'loco-face', '🚂'));
+  var faceEl = el('div', 'loco-face');
+  faceEl.innerHTML = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    + '<g fill="none" fill-rule="evenodd">'
+    + '<circle cx="32" cy="28" r="12" fill="#FFDDB6" stroke="#a67c52" stroke-width="1"/>'
+    + '<rect x="20" y="8" width="24" height="8" rx="3" fill="#1E90FF"/>'
+    + '<circle cx="24" cy="24" r="2" fill="#333"/>'
+    + '<circle cx="40" cy="24" r="2" fill="#333"/>'
+    + '<path d="M22 36c3 4 14 4 17 0" stroke="#7a4f2a" stroke-width="2" stroke-linecap="round"/>'
+    + '</g></svg>';
+  locoTop.appendChild(faceEl);
   var wins = el('div', 'loco-wins');
   wins.appendChild(makeSlotEl('loco-win1'));
   locoTop.appendChild(wins);
@@ -347,8 +356,7 @@ function buildTrainHTML_Simple(wrap) {
   var loco = el('div', 'loco');
   loco.id = 'trainLoco';
 
-  var front = el('div', 'loco-front');
-  loco.appendChild(front);
+  // loco-front removed per request (SVG front omitted)
 
   var chiArea = el('div', 'loco-chimney-area');
   chiArea.appendChild(el('div', 'chimney-top'));
@@ -357,7 +365,17 @@ function buildTrainHTML_Simple(wrap) {
 
   var locoTop = el('div', 'loco-top');
   locoTop.appendChild(el('div', 'loco-roof-bow'));
-  locoTop.appendChild(el('div', 'loco-face', '😊'));
+  // loco-face as SVG operator
+  var faceEl = el('div', 'loco-face');
+  faceEl.innerHTML = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    + '<g fill="none" fill-rule="evenodd">'
+    + '<circle cx="32" cy="28" r="12" fill="#FFDDB6" stroke="#a67c52" stroke-width="1"/>'
+    + '<rect x="20" y="8" width="24" height="8" rx="3" fill="#1E90FF"/>'
+    + '<circle cx="24" cy="24" r="2" fill="#333"/>'
+    + '<circle cx="40" cy="24" r="2" fill="#333"/>'
+    + '<path d="M22 36c3 4 14 4 17 0" stroke="#7a4f2a" stroke-width="2" stroke-linecap="round"/>'
+    + '</g></svg>';
+  locoTop.appendChild(faceEl);
 
   var wins = el('div', 'loco-wins');
   wins.appendChild(makeSlotEl('loco-win1'));
@@ -425,7 +443,16 @@ function buildTrainHTML_Complex(wrap) {
   loco.appendChild(chimneyRow);
 
   var locoTop = el('div', 'loco-top');
-  locoTop.appendChild(el('div', 'loco-face', '😊'));
+  var faceEl = el('div', 'loco-face');
+  faceEl.innerHTML = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    + '<g fill="none" fill-rule="evenodd">'
+    + '<circle cx="32" cy="28" r="12" fill="#FFDDB6" stroke="#a67c52" stroke-width="1"/>'
+    + '<rect x="20" y="8" width="24" height="8" rx="3" fill="#1E90FF"/>'
+    + '<circle cx="24" cy="24" r="2" fill="#333"/>'
+    + '<circle cx="40" cy="24" r="2" fill="#333"/>'
+    + '<path d="M22 36c3 4 14 4 17 0" stroke="#7a4f2a" stroke-width="2" stroke-linecap="round"/>'
+    + '</g></svg>';
+  locoTop.appendChild(faceEl);
 
   var wins = el('div', 'loco-wins');
   wins.appendChild(makeSlotEl('loco-win1'));
